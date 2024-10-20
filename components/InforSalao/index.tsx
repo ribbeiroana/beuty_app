@@ -1,65 +1,60 @@
-import { ImageBackground, StyleSheet, View, Image, Text, Button, Pressable } from 'react-native'
+import { StyleSheet, View, Image, Text, Pressable } from 'react-native';
 
-
-export interface PaginaProps {
-  children: React.ReactNode
-}
-
-const background = require('@/assets/images/background.jpg')
-
-export default function InforSalao(props: PaginaProps) {
+export default function InforSalao() {
   return (
-    <View style={styles.container}>
-      <Image>
-
-      </Image>
-      <Text style={styles.salao}>Beleza Pura</Text>
+    <View style={styles.containerDois}>
+      <View style={styles.header}>
+        <Image 
+          source={require('@/assets/images/react-logo.png')} // Altere o caminho para a sua imagem
+          style={styles.profileImage}
+        />
+        <Text style={styles.salao}>Beleza Pura</Text>
+      </View>
       <Text style={styles.nome}>Ana Silva</Text>
       <Text style={styles.informacoes}>Especialista em corte e coloração</Text>
       <Text style={styles.informacoes}>Rua das Flores, 123</Text>
       <Text style={styles.servico}>Serviços</Text>
-      <Text>Corte de cabelo (Corte masculino e feminino) / valor</Text>
-      <Pressable>Agendar</Pressable>
+      <Text style={styles.servicoItens}>Corte de cabelo (Corte masculino e feminino) / valor</Text>
+      <Text style={styles.servicoItens}>Corte de cabelo (Corte masculino e feminino) / valor</Text>
+      <Text style={styles.servicoItens}>Corte de cabelo (Corte masculino e feminino) / valor</Text>
+      <Text style={styles.servicoItens}>Corte de cabelo (Corte masculino e feminino) / valor</Text>
 
-
+      <Text style={styles.cardTitulo}>Horários</Text>
       <View style={styles.card}>
-        <Text style={styles.cardTitulo} >Horários</Text>
-        <Pressable style={styles.button}>8:00 - 10/10 </Pressable>
+        <View style={styles.buttonContainer}>
+          <Pressable style={styles.button}><Text>8:00 - 14/10</Text></Pressable>
+          <Pressable style={styles.button}><Text>8:00 - 14/10</Text></Pressable>
+          <Pressable style={styles.button}><Text>8:00 - 14/10</Text></Pressable>
+          <Pressable style={styles.button}><Text>8:00 - 14/10</Text></Pressable>
+        </View>
       </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  containerDois: {
     color: 'white',
     backgroundColor: '#008584',
-    marginTop: 100,
     width: '100%',
-    height: '100%',
-    // borderRadius: 50,
-    // 0 0 0
+    height: '90%',
   },
-  background: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'flex-start', // Alinha a imagem no topo
+    marginBottom: 10, // Espaço abaixo do cabeçalho
   },
-  texto: {
-    color: 'white',
-    fontSize: 23,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    opacity: 0.8,
+  profileImage: {
+    width: 50, // Defina a largura da imagem
+    height: 50, // Defina a altura da imagem
+    marginRight: 10, // Espaço entre a imagem e o texto
+    marginTop: -10, // Ajuste para que a imagem "saia" para cima
   },
   salao: {
     color: 'white',
     fontWeight: '800',
     fontSize: 30,
-    textAlign: 'center',
-
+    textAlign: 'left', // Alinha o texto à esquerda
   },
   nome: {
     color: 'white',
@@ -75,33 +70,58 @@ const styles = StyleSheet.create({
   },
   servico: {
     color: 'white',
-    marginTop: 10,
+    marginTop: 25,
     fontWeight: '800',
     marginLeft: 10,
     fontSize: 20,
   },
+  servicoItens: {
+    color: 'white',
+    marginLeft: 10,
+    marginTop: 15,
+  },
   card: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
     backgroundColor: '#006666',
     color: 'white',
-    height: 70,
-    borderRadius: 30,
+    padding: 10,
+    margin: 10,
+    borderTopLeftRadius: 50,
+    borderBottomRightRadius: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
+    elevation: 5,
   },
   cardTitulo: {
+    marginTop: 30,
     textAlign: 'center',
     fontWeight: '800',
     fontSize: 20,
     color: 'white',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
   button: {
+    alignItems: 'center',
     backgroundColor: 'white',
     color: '#006666',
     fontWeight: '900',
     fontSize: 17,
-    borderRadius: 30,
     width: '20%',
-  }
-
-})
-
-
-
+    padding: 10,
+    margin: 7,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
+    elevation: 5,
+  },
+});

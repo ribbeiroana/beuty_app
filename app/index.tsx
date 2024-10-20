@@ -2,17 +2,22 @@
 // import Logo from '@/components/template/Logo'
 // import Pagina from '@/components/template/Pagina'
 // import Pergunta from '@/components/questionario/Pergunta'
-import useQuestionario from '@/data/hooks/useQuestionario'
+// import useQuestionario from '@/data/hooks/useQuestionario'
 // import Resultado from '@/components/questionario/Resultado'
-import  Perfil from '../pages/Salao';
+// import  Salao from '../pages/Salao';
+// import Perfil from '@/pages/Perfil';
 
-export default function Index() {
-    const { pergunta, concluido, pontuacao, totalDePerguntas, responder, reiniciar } =
-        useQuestionario()
+import Salao from "@/pages/Salao";
+import Perfil from "@/pages/Perfil";
+export default function App() {
+    // const { pergunta, concluido, pontuacao, totalDePerguntas, responder, reiniciar } =
+    //     useQuestionario()
 
     return (
         <>
-        <Perfil/>
+        {/* <Perfil/> */}
+        <Salao/>
+
         {/* <Funcionario/> */}
         {/* <RouteApp/> */}
         {/* <Global/> */}

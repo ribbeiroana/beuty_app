@@ -1,12 +1,12 @@
 import { ImageBackground, StyleSheet, View } from 'react-native'
 
-export interface PaginaProps {
-  children: React.ReactNode
-}
+// export interface PaginaProps {
+//   children: React.ReactNode
+// }
 
 const background = require('@/assets/images/background.jpg')
 
-export default function FotosSalao(props: PaginaProps) {
+export default function FotosSalao() {
   return (
       <View style={styles.container}>
           <ImageBackground
@@ -15,7 +15,7 @@ export default function FotosSalao(props: PaginaProps) {
               style={styles.image}
               imageStyle={{ opacity: 0.4 }}
           >
-              {props.children}
+              {/* {props.children} */}
           </ImageBackground>
       </View>
   )
