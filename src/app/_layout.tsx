@@ -6,9 +6,9 @@ export default function Layout() {
     <Tabs screenOptions={{ headerShown: false
     }}>
       <Tabs.Screen
-        name='home'
+        name='index'
         options={{
-          title: 'Home',
+          title: 'index',
           tabBarIcon: ({ focused, color, size }) => {
 
             if (focused) {
