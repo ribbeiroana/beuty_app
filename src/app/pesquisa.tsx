@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import { StyleSheet, ScrollView, Text, View, TextInput, FlatList, Image, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';  // Importando useRouter para navegação
 
 interface Profile {
   id: string;
@@ -11,40 +12,49 @@ interface Profile {
 const profiles: Profile[] = [
   { id: '1', name: 'Maria', imageUrl: 'https://example.com/maria.jpg' },
   { id: '2', name: 'Alice', imageUrl: 'https://example.com/alice.jpg' },
-  { id: '3', name: 'Clara', imageUrl: 'https://example.com/clara.jpg' } // aqui mudar, botar as imagens
+  { id: '3', name: 'Clara', imageUrl: 'https://example.com/clara.jpg' } // Mude as imagens conforme necessário
 ];
 
 const App: React.FC = () => {
   const [search, setSearch] = React.useState('');
+  const router = useRouter();  // Inicializando o router
 
   const filteredProfiles = profiles.filter(profile => 
     profile.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const handleProfilePress = (id: string) => {
+    // Navegar para a tela de salão com o ID do perfil, se necessário
+    router.push('./salao'); // Mude para a navegação desejada
+  };
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-    <View style={styles.container}>
-      <Text style={styles.headerText}>ENCONTRE O ATENDIMENTO MAIS PERTO DE VOCÊ...</Text>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Digite seu email..."
-        value={search}
-        onChangeText={text => setSearch(text)}
-      />
-      <FlatList
-        data={filteredProfiles}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.profileContainer}>
-            <Image source={{ uri: item.imageUrl }} style={styles.profileImage} />
-            <Text style={styles.profileName}>{item.name}</Text>
-            <TouchableOpacity style={styles.profileButton}>
-              <Text style={styles.profileButtonText}>VER PERFIL</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
-    </View>
+      <View style={styles.container}>
+        <Text style={styles.headerText}>ENCONTRE O ATENDIMENTO MAIS PERTO DE VOCÊ...</Text>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Digite seu email..."
+          value={search}
+          onChangeText={text => setSearch(text)}
+        />
+        <FlatList
+          data={filteredProfiles}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.profileContainer}>
+              <Image source={{ uri: item.imageUrl }} style={styles.profileImage} />
+              <Text style={styles.profileName}>{item.name}</Text>
+              <TouchableOpacity 
+                style={styles.profileButton} 
+                onPress={() => handleProfilePress(item.id)}  // Chamando a função de navegação
+              >
+                <Text style={styles.profileButtonText}>VER PERFIL</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      </View>
     </ScrollView>
   );
 };
