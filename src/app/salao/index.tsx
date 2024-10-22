@@ -1,162 +1,181 @@
-import {ImageBackground, View, ScrollView, StyleSheet, Pressable, Text, Image } from 'react-native';
-// import FotosSalao from '../../components/FotosSalao';
-// import InforSalao from '../../components/InforSalao';
+import React, { useState } from 'react';
+import { View, ScrollView, StyleSheet, Pressable, Text, Image, Alert } from 'react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome'; // Importando o ícone
 
-const background = require('@/assets/images/background.jpg')
+const atendente = {
+  nome: 'Joana Souza',
+  bio: 'Especialista em unhas e sobrancelhas',
+};
+
+const salao = {
+  nome: 'Unhas Perfeitas',
+  logo: 'https://picsum.photos/200/300?random=5',
+  endereco: 'Shopping Center, 10', // Endereço adicionado
+};
+
+const servicos = [
+  { 
+    nome: 'Tratamento Capilar', 
+    descricao: 'Hidratação e recuperação capilar', 
+    valor: 200.0, 
+    horarios: ["11:00 - 14/10", "12:00 - 14/10", "13:00 - 14/10"]
+  },
+  { 
+    nome: 'Corte de cabelo', 
+    descricao: 'Corte masculino e feminino', 
+    valor: 50.0, 
+    horarios: ["8:00 - 14/10", "9:00 - 14/10", "10:00 - 14/10"] 
+  },
+  { 
+    nome: 'Manicure', 
+    descricao: 'Cuidado e embelezamento das unhas', 
+    valor: 40.0, 
+    horarios: ["8:30 - 14/10", "9:30 - 14/10", "10:30 - 14/10"] 
+  },
+];
 
 export default function Salao() {
+  const [horariosVisiveis, setHorariosVisiveis] = useState(false);
+  const [servicoSelecionado, setServicoSelecionado] = useState('');
+  const [horariosSelecionados, setHorariosSelecionados] = useState([]);
+
+  const confirmarAgendamento = (horario) => {
+    Alert.alert(
+      "Confirmação de Agendamento",
+      `Você deseja agendar ${servicoSelecionado} para ${horario}?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Confirmar", onPress: () => console.log(`Agendamento confirmado: ${servicoSelecionado} - ${horario}`) },
+      ]
+    );
+  };
+
+  const selecionarServico = (servico) => {
+    setServicoSelecionado(servico.nome);
+    setHorariosSelecionados(servico.horarios);
+    setHorariosVisiveis(true);
+  };
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={styles.containerUm}>
-      <ImageBackground
-              source={background}
-              resizeMode="cover"
-              style={styles.image}
-              imageStyle={{ opacity: 0.4 }}
-          >
-              {/* {props.children} */}
-          </ImageBackground>
-        {/* <InforSalao /> */}
-        <View style={styles.containerDois}>
-      <View style={styles.header}>
-        <Image 
-          source={require('@/assets/images/react-logo.png')} // Altere o caminho para a sua imagem
-          style={styles.profileImage}
-        />
-        <Text style={styles.salao}>Beleza Pura</Text>
-      </View>
-      <Text style={styles.nome}>Ana Silva</Text>
-      <Text style={styles.informacoes}>Especialista em corte e coloração</Text>
-      <Text style={styles.informacoes}>Rua das Flores, 123</Text>
-      <Text style={styles.servico}>Serviços</Text>
-      <Text style={styles.servicoItens}>Corte de cabelo (Corte masculino e feminino) / valor</Text>
-      <Text style={styles.servicoItens}>Corte de cabelo (Corte masculino e feminino) / valor</Text>
-      <Text style={styles.servicoItens}>Corte de cabelo (Corte masculino e feminino) / valor</Text>
-      <Text style={styles.servicoItens}>Corte de cabelo (Corte masculino e feminino) / valor</Text>
-
-      <Text style={styles.cardTitulo}>Horários</Text>
-      <View style={styles.card}>
-        <View style={styles.buttonContainer}>
-          <Pressable style={styles.button}><Text>8:00 - 14/10</Text></Pressable>
-          <Pressable style={styles.button}><Text>8:00 - 14/10</Text></Pressable>
-          <Pressable style={styles.button}><Text>8:00 - 14/10</Text></Pressable>
-          <Pressable style={styles.button}><Text>8:00 - 14/10</Text></Pressable>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Image source={{ uri: salao.logo }} style={styles.logo} />
+          <Text style={styles.salaoNome}>{salao.nome}</Text>
         </View>
-      </View>
-    </View>
+
+        <Text style={styles.atendenteNome}>{atendente.nome}</Text>
+        <Text style={styles.atendenteBio}>{atendente.bio}</Text>
+        <Text style={styles.endereco}>{salao.endereco}</Text> {/* Exibindo o endereço */}
+
+        <View style={styles.servicoContainer}>
+          <FontAwesome name="scissors" size={20} color="white" />
+          <Text style={styles.servico}>Serviços</Text>
+        </View>
+
+        {servicos.map((servico, index) => (
+          <Pressable key={index} style={styles.servicoItem} onPress={() => selecionarServico(servico)}>
+            <Text style={styles.servicoNome}>{servico.nome} - R$ {servico.valor}</Text>
+            <Text style={styles.servicoDescricao}>{servico.descricao}</Text>
+          </Pressable>
+        ))}
+
+        {horariosVisiveis && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitulo}>Horários disponíveis para {servicoSelecionado}</Text>
+            {horariosSelecionados.map((horario, index) => (
+              <Pressable key={index} style={styles.button} onPress={() => confirmarAgendamento(horario)}>
+                <Text style={styles.horarioTexto}>{horario}</Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
       </View>
     </ScrollView>
   );
 }
 
-
 const styles = StyleSheet.create({
-  containerUm: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'black',
-  },
-  image: {
-      flex: 1,
-      width: '100%',
-      height: 100,
-      justifyContent: 'center',
-      alignItems: 'center',
-  },
-  containerDois: {
-    color: 'white',
+  container: {
     backgroundColor: '#008584',
-    width: '100%',
-    height: '90%',
+    padding: 20,
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'flex-start', // Alinha a imagem no topo
-    marginBottom: 10, // Espaço abaixo do cabeçalho
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  profileImage: {
-    width: 50, // Defina a largura da imagem
-    height: 50, // Defina a altura da imagem
-    marginRight: 10, // Espaço entre a imagem e o texto
-    marginTop: -10, // Ajuste para que a imagem "saia" para cima
+  logo: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
   },
-  salao: {
+  salaoNome: {
     color: 'white',
     fontWeight: '800',
     fontSize: 30,
-    textAlign: 'left', // Alinha o texto à esquerda
   },
-  nome: {
+  atendenteNome: {
     color: 'white',
-    fontWeight: '400',
-    textAlign: 'center',
-    marginBottom: 10,
+    fontWeight: '800',
+    marginTop: 10,
   },
-  informacoes: {
+  atendenteBio: {
     color: 'white',
-    fontSize: 15,
-    fontWeight: '700',
-    marginLeft: 10,
+  },
+  endereco: {
+    color: 'white',
+    marginBottom: 20,
+  },
+  servicoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 25,
   },
   servico: {
     color: 'white',
-    marginTop: 25,
     fontWeight: '800',
-    marginLeft: 10,
     fontSize: 20,
-  },
-  servicoItens: {
-    color: 'white',
     marginLeft: 10,
-    marginTop: 15,
+  },
+  servicoItem: {
+    backgroundColor: '#006666',
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 5,
+  },
+  servicoNome: {
+    color: 'white',
+    fontSize: 16,
+  },
+  servicoDescricao: {
+    color: 'white',
+    fontSize: 14,
   },
   card: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
     backgroundColor: '#006666',
-    color: 'white',
     padding: 10,
-    margin: 10,
-    borderTopLeftRadius: 50,
-    borderBottomRightRadius: 50,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5,
+    marginTop: 20,
+    borderRadius: 10,
   },
   cardTitulo: {
-    marginTop: 30,
-    textAlign: 'center',
-    fontWeight: '800',
-    fontSize: 20,
     color: 'white',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
+    fontWeight: '800',
+    marginBottom: 10,
+    textAlign: 'center',
   },
   button: {
-    alignItems: 'center',
     backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 30,
+    marginVertical: 10,
+    marginHorizontal: 20,
+    alignItems: 'center',
+  },
+  horarioTexto: {
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#006666',
-    fontWeight: '900',
-    fontSize: 17,
-    width: '20%',
-    padding: 10,
-    margin: 7,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.5,
-    elevation: 5,
   },
-  buttonHover: {
-    backgroundColor: '#f0f0f0', // Cor ao passar o mouse (ou pressionar)
-    // Você pode adicionar outras propriedades de estilo para o hover aqui
-  },
-})
+});
