@@ -45,10 +45,13 @@ const App: React.FC = () => {
     salon.endereco.toLowerCase().includes(search.toLowerCase()) // Filtragem pelo endereço
   );
 
-  const handleSalonPress = async (id: number) => {
+  const handleSalonPress = async (id: number, atendenteId: number) => {
     try {
-      await AsyncStorage.setItem('selectedSalonId', id.toString()); // Armazenar o ID do salão
-      router.push('../../detalhes'); // Navegar para a tela de detalhes
+      await AsyncStorage.setItem('selectedSalonId', id.toString());
+      await AsyncStorage.setItem('selectedAtendenteId', atendenteId.toString());
+       // Armazenar o ID do salão
+       // Armazenar o ID do atendente para pegar na proxima tela 
+      router.push('/detalhes'); // Navegar para a tela de detalhes
     } catch (error) {
       console.error('Erro ao armazenar o ID do salão:', error);
       Alert.alert('Erro', 'Não foi possível armazenar o ID do salão.');
@@ -77,7 +80,7 @@ const App: React.FC = () => {
               </View>
               <TouchableOpacity 
                 style={styles.salonButton} 
-                onPress={() => handleSalonPress(item.id)}  // Navegar para a tela de detalhes
+                onPress={() => handleSalonPress(item.id, item.atendenteId)}  // Navegar para a tela de detalhes
               >
                 <Text style={styles.salonButtonText}>VER DETALHES</Text>
               </TouchableOpacity>
@@ -120,7 +123,7 @@ const styles = StyleSheet.create({
   salonImage: {
     width: 50,
     height: 50,
-    borderRadius: 5,
+    borderRadius: 100,
     marginRight: 10,
   },
   salonInfo: {

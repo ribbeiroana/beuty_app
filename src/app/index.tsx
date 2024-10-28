@@ -34,7 +34,7 @@ export default function Login() {
         await AsyncStorage.setItem('authToken', data.token);
         await AsyncStorage.setItem('userId', data.id.toString()); // Armazena o ID como string
         Alert.alert('Bem-vindo(a)', `Olá, ${data.nome}!`);
-        router.push('/tabs'); // Redireciona para a tela de tabs
+        router.push('/beuty'); // Redireciona para a tela de tabs
       }
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login. Por favor, tente novamente.');

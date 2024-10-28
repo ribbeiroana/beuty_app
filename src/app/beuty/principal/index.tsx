@@ -74,7 +74,7 @@ export default function Home() {
         </View>
 
         {/* Link para Agendar Horário */}
-        <Link href="/pesquisa" style={styles.link}>
+        <Link href="./pesquisa" style={styles.link}>
           {/* <Animated.View style={{ transform: [{ scale: scaleAnim }] }}> */}
             <Pressable
               onPressIn={handlePressIn}
@@ -148,19 +148,21 @@ const styles = StyleSheet.create({
   },
   link: {
     width: '100%',
+    
   },
   button: {
     backgroundColor: '#006666',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
-    marginVertical: 20,
+    display: 'flex',
     elevation: 5,
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   tipsList: {
     paddingBottom: 20,

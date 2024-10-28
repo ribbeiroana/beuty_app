@@ -5,7 +5,8 @@ export default function Layout() {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="cadastro/index" options={{ headerShown: false }} />
-      <Stack.Screen name="tabs/_layout" options={{ headerShown: false,  title: 'Beuty',}} />
+      <Stack.Screen name="login/index" options={{ headerShown: false }} />
+      <Stack.Screen name="beuty/_layout" options={{ headerShown: false,  title: 'Beuty',}} />
     </Stack>
   );
 }

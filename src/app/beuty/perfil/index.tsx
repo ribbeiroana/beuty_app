@@ -33,7 +33,7 @@ export default function Perfil() {
 
         <View style={styles.imagemContainer}>
           <Image 
-            // source={require('../../assets/images/designEstrela.png')} // Ajuste o caminho da imagem
+            source={require('@/assets/images/designEstrela.png')} // Ajuste o caminho da imagem
             style={styles.estrelaImagem} 
           />
           <Text style={styles.tituloHistorico}>Histórico de Agendamento</Text>

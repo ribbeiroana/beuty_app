@@ -1,25 +1,50 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router'; // Importando useRouter para navegação
+import { useRouter } from 'expo-router';
+import { Link } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const router = useRouter(); // Inicializando o router
+  const router = useRouter();
 
-  const handleLogin = () => {
-    if (email === 'admin@example.com' && password === 'password123') {
-      Alert.alert('Login Successful', 'Welcome back!');
-      router.push('/tabs'); // Redirecionar para a tela de tabs após o login
-    } else {
-      Alert.alert('Login Failed', 'Invalid email or password');
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      return;
+    }
+
+    try {
+      const response = await fetch('https://beauty-api-private-1.onrender.com/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, senha: password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        Alert.alert('Login Falhou', data.message);
+      } else {
+        // Armazenar o token e o ID do usuário
+        await AsyncStorage.setItem('authToken', data.token);
+        await AsyncStorage.setItem('userId', data.id.toString()); // Armazena o ID como string
+        Alert.alert('Bem-vindo(a)', `Olá, ${data.nome}!`);
+        router.push('/tabs'); // Redireciona para a tela de tabs
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login. Por favor, tente novamente.');
+      console.error(error);
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* <Image style={styles.image} source={require('@/assets/images/logo.png')} /> */}
+      <Image style={styles.image} source={require('@/assets/images/logo.png')} />
 
       <View style={styles.inputContainer}>
         <Ionicons name="mail" size={24} color="#008584" />
@@ -51,7 +76,9 @@ export default function Login() {
       </TouchableOpacity>
 
       <TouchableOpacity>
-        <Link href="/cadastro"><Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se</Text></Link>
+        <Link href="/cadastro">
+          <Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se</Text>
+        </Link>
       </TouchableOpacity>
     </View>
   );
@@ -88,7 +115,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#004d4d',
     paddingVertical: 15,
-    width:'100%',
+    width: '100%',
     borderRadius: 5,
     marginBottom: 20,
   },

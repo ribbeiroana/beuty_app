@@ -33,7 +33,7 @@ export default function Cadastro() {
       } else {
         // Se o cadastro for bem-sucedido, exibe um alerta de sucesso e redireciona para a tela de login
         Alert.alert('Cadastro Concluído', `Bem vindo(a)! ${data.nome}.`);
-        router.push('../index');
+        router.push('/login');
       }
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao tentar se cadastrar. Por favor, tente novamente.');

@@ -6,8 +6,9 @@ import { useRouter } from 'expo-router';
 
 const SalaoDetails = () => {
   const router = useRouter();
-  const { id } = router.query || {};
+  const { id, atendenteId } = router.query || {};
   console.log('ID do salão:', id); // Verificando se o ID está correto
+  console.log('ID do salão:', atendenteId); // Verificando se o ID está correto
 
   const [salao, setSalao] = useState(null);
   const [servicos, setServicos] = useState([]);
@@ -21,6 +22,8 @@ const SalaoDetails = () => {
     const fetchUserId = async () => {
       const id = await AsyncStorage.getItem('userId');
       setUserId(id);
+      const atendenteId = await AsyncStorage.getItem('atendenteId');
+      // setatendenteId(atendenteId);
     };
 
     fetchUserId();
