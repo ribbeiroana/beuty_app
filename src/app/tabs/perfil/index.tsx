@@ -31,10 +31,9 @@ export default function Perfil() {
           <Text style={styles.usuario}>Nome Usuário</Text>
         </View>
 
-        {/* Imagem no canto esquerdo, antes do título */}
         <View style={styles.imagemContainer}>
           <Image 
-            source={require('@/assets/images/designEstrela.png')} 
+            // source={require('../../assets/images/designEstrela.png')} // Ajuste o caminho da imagem
             style={styles.estrelaImagem} 
           />
           <Text style={styles.tituloHistorico}>Histórico de Agendamento</Text>
@@ -94,11 +93,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '500',
     fontSize: 20,
-    marginLeft: 10, // Espaçamento entre a imagem e o texto
+    marginLeft: 10,
   },
   estrelaImagem: {
-    width: 50, // Ajuste o tamanho conforme necessário
-    height: 50, // Ajuste o tamanho conforme necessário
+    width: 50,
+    height: 50,
   },
   itensAgendados: {
     backgroundColor: '#ffffff',

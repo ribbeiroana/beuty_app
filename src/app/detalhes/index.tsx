@@ -1,43 +1,64 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, StyleSheet, Pressable, Text, Image, Alert } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome'; // Importando o ícone
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
-const atendente = {
-  nome: 'Joana Souza',
-  bio: 'Especialista em unhas e sobrancelhas',
-};
+const SalaoDetails = () => {
+  const router = useRouter();
+  const { id } = router.query || {};
+  console.log('ID do salão:', id); // Verificando se o ID está correto
 
-const salao = {
-  nome: 'Unhas Perfeitas',
-  logo: 'https://picsum.photos/200/300?random=5',
-  endereco: 'Shopping Center, 10', // Endereço adicionado
-};
-
-const servicos = [
-  { 
-    nome: 'Tratamento Capilar', 
-    descricao: 'Hidratação e recuperação capilar', 
-    valor: 200.0, 
-    horarios: ["11:00 - 14/10", "12:00 - 14/10", "13:00 - 14/10"]
-  },
-  { 
-    nome: 'Corte de cabelo', 
-    descricao: 'Corte masculino e feminino', 
-    valor: 50.0, 
-    horarios: ["8:00 - 14/10", "9:00 - 14/10", "10:00 - 14/10"] 
-  },
-  { 
-    nome: 'Manicure', 
-    descricao: 'Cuidado e embelezamento das unhas', 
-    valor: 40.0, 
-    horarios: ["8:30 - 14/10", "9:30 - 14/10", "10:30 - 14/10"] 
-  },
-];
-
-export default function Salao() {
+  const [salao, setSalao] = useState(null);
+  const [servicos, setServicos] = useState([]);
   const [horariosVisiveis, setHorariosVisiveis] = useState(false);
   const [servicoSelecionado, setServicoSelecionado] = useState('');
   const [horariosSelecionados, setHorariosSelecionados] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const id = await AsyncStorage.getItem('userId');
+      setUserId(id);
+    };
+
+    fetchUserId();
+  }, []);
+
+  useEffect(() => {
+    const fetchSalaoDetails = async () => {
+      if (!id) return;
+
+      try {
+        const token = await AsyncStorage.getItem('authToken');
+        console.log('Token:', token); // Verificando o token
+
+        const response = await fetch(`https://beauty-api-private-1.onrender.com/salao/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Erro da API:', errorData);
+          throw new Error(errorData.message || 'Erro ao buscar os detalhes do salão');
+        }
+
+        const data = await response.json();
+        setSalao(data);
+        setServicos(data.servicos || []);
+      } catch (error) {
+        console.error('Erro ao buscar detalhes do salão:', error);
+        Alert.alert('Erro', 'Não foi possível buscar os detalhes do salão.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSalaoDetails();
+  }, [id]);
 
   const confirmarAgendamento = (horario) => {
     Alert.alert(
@@ -45,16 +66,24 @@ export default function Salao() {
       `Você deseja agendar ${servicoSelecionado} para ${horario}?`,
       [
         { text: "Cancelar", style: "cancel" },
-        { text: "Confirmar", onPress: () => console.log(`Agendamento confirmado: ${servicoSelecionado} - ${horario}`) },
+        { text: "Confirmar", onPress: () => console.log(`Agendamento confirmado: ${servicoSelecionado} - ${horario} para o usuário ${userId}`) },
       ]
     );
   };
 
   const selecionarServico = (servico) => {
     setServicoSelecionado(servico.nome);
-    setHorariosSelecionados(servico.horarios);
+    setHorariosSelecionados(servico.horarios || []);
     setHorariosVisiveis(true);
   };
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (!salao) {
+    return <Text>Salão não encontrado.</Text>;
+  }
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -64,9 +93,7 @@ export default function Salao() {
           <Text style={styles.salaoNome}>{salao.nome}</Text>
         </View>
 
-        <Text style={styles.atendenteNome}>{atendente.nome}</Text>
-        <Text style={styles.atendenteBio}>{atendente.bio}</Text>
-        <Text style={styles.endereco}>{salao.endereco}</Text> {/* Exibindo o endereço */}
+        <Text style={styles.endereco}>{salao.endereco}</Text>
 
         <View style={styles.servicoContainer}>
           <FontAwesome name="scissors" size={20} color="white" />
@@ -75,7 +102,7 @@ export default function Salao() {
 
         {servicos.map((servico, index) => (
           <Pressable key={index} style={styles.servicoItem} onPress={() => selecionarServico(servico)}>
-            <Text style={styles.servicoNome}>{servico.nome} - R$ {servico.valor}</Text>
+            <Text style={styles.servicoNome}>{servico.nome} - R$ {servico.valor.toFixed(2)}</Text>
             <Text style={styles.servicoDescricao}>{servico.descricao}</Text>
           </Pressable>
         ))}
@@ -93,7 +120,7 @@ export default function Salao() {
       </View>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -115,14 +142,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '800',
     fontSize: 30,
-  },
-  atendenteNome: {
-    color: 'white',
-    fontWeight: '800',
-    marginTop: 10,
-  },
-  atendenteBio: {
-    color: 'white',
   },
   endereco: {
     color: 'white',
@@ -179,3 +198,5 @@ const styles = StyleSheet.create({
     color: '#006666',
   },
 });
+
+export default SalaoDetails;

@@ -1,23 +1,44 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router'; // Importando useRouter
+
 export default function Cadastro() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const router = useRouter(); // Inicializando o router
 
-  const handleCadastro = () => {
-    if (nome && email && senha) {
-      Alert.alert('Cadastro Concluído', 'Seja bem-vindo ao Beauty!');
-    } else {
+  const handleCadastro = async () => {
+    // Verifica se os campos estão preenchidos
+    if (!nome || !email || !senha) {
       Alert.alert('Erro no Cadastro', 'Por favor, preencha todos os campos.');
+      return;
     }
-  };
 
-  const handleEsqueceuSenha = () => {
+    try {
+      const response = await fetch('https://beauty-api-private-1.onrender.com/cadastro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nome, email, senha }),
+      });
 
-    Alert.alert('Recuperação de Senha', 'A lógica de recuperação de senha será implementada.');
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Se a resposta não for OK, exibe a mensagem de erro
+        Alert.alert('Erro no Cadastro', data.message);
+      } else {
+        // Se o cadastro for bem-sucedido, exibe um alerta de sucesso e redireciona para a tela de login
+        Alert.alert('Cadastro Concluído', `Bem vindo(a)! ${data.nome}.`);
+        router.push('../index');
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar se cadastrar. Por favor, tente novamente.');
+      console.error(error);
+    }
   };
 
   return (
@@ -62,10 +83,6 @@ export default function Cadastro() {
 
       <TouchableOpacity style={styles.button} onPress={handleCadastro}>
         <Text style={styles.buttonText}>CADASTRAR</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={handleEsqueceuSenha} style={styles.linkContainer}>
-      <Link href="/login"><Text style={styles.linkText}>já possui uma conta? faça login.</Text></Link>
       </TouchableOpacity>
     </View>
   );
@@ -112,14 +129,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  linkContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  linkText: {
-    color: '#fff',
-    fontSize: 16,
-    textDecorationLine: 'underline',
   },
 });

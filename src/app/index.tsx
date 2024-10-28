@@ -1,168 +1,132 @@
-import React, { useRef } from 'react';
-import { View, StyleSheet, Image, Pressable, Text, ScrollView, FlatList, Animated } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { Link } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const services = [
-  { id: '1', name: 'Corte de Cabelo' },
-  { id: '2', name: 'Manicure' },
-  { id: '3', name: 'Penteado' },
-  { id: '4', name: 'Maquiagem' },
-  { id: '5', name: 'Limpeza de Pele' },
-];
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
 
-const beautyTips = [
-  { id: '1', tip: 'Mantenha a pele hidratada todos os dias.' },
-  { id: '2', tip: 'Use protetor solar mesmo em dias nublados.' },
-  { id: '3', tip: 'Beba bastante água para manter a pele saudável.' },
-  { id: '4', tip: 'Evite dormir de maquiagem.' },
-  { id: '5', tip: 'Experimente novos estilos, não tenha medo de mudar!' },
-];
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      return;
+    }
 
-export default function Home() {
-  const fadeAnim = new Animated.Value(0);
-  const scaleAnim = useRef(new Animated.Value(1)).current;  // Adiciona referência para animação de escala
+    try {
+      const response = await fetch('https://beauty-api-private-1.onrender.com/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, senha: password }),
+      });
 
-  const animateTips = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
+      const data = await response.json();
+
+      if (!response.ok) {
+        Alert.alert('Login Falhou', data.message);
+      } else {
+        // Armazenar o token e o ID do usuário
+        await AsyncStorage.setItem('authToken', data.token);
+        await AsyncStorage.setItem('userId', data.id.toString()); // Armazena o ID como string
+        Alert.alert('Bem-vindo(a)', `Olá, ${data.nome}!`);
+        router.push('/tabs'); // Redireciona para a tela de tabs
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login. Por favor, tente novamente.');
+      console.error(error);
+    }
   };
-
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.95,
-      friction: 3,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      friction: 3,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  React.useEffect(() => {
-    animateTips();
-  }, []);
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={styles.container}>
-        <Image style={styles.image} source={require('@/assets/images/logo.png')} />
-        
-        {/* Seção de Serviços Populares */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Serviços Populares</Text>
-          <FlatList
-            data={services}
-            keyExtractor={(item) => item.id}
-            horizontal
-            renderItem={({ item }) => (
-              <View style={styles.card}>
-                <MaterialIcons name="star" size={24} color="#008584" />
-                <Text style={styles.item}>{item.name}</Text>
-              </View>
-            )}
-          />
-        </View>
+    <View style={styles.container}>
+      <Image style={styles.image} source={require('@/assets/images/logo.png')} />
 
-        {/* Link para Agendar Horário */}
-        <Link href="/pesquisa" style={styles.link}>
-          <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-            <Pressable
-              onPressIn={handlePressIn}
-              onPressOut={handlePressOut}
-            >
-              <View style={styles.button}>
-                <Text style={styles.buttonText}>Agendar um Horário</Text>
-              </View>
-            </Pressable>
-          </Animated.View>
-        </Link>
-
-        {/* Seção de Dicas de Beleza */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Dicas de Beleza</Text>
-          <FlatList
-            data={beautyTips}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Animated.View style={[styles.card, { opacity: fadeAnim, transform: [{ translateX: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [100, 0] }) }] }]}>
-                <AntDesign name="heart" size={24} color="#008584" />
-                <Text style={styles.item}>{item.tip}</Text>
-              </Animated.View>
-            )}
-            contentContainerStyle={styles.tipsList}
-          />
-        </View>
+      <View style={styles.inputContainer}>
+        <Ionicons name="mail" size={24} color="#008584" />
+        <TextInput
+          style={styles.input}
+          placeholder="Digite seu email..."
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholderTextColor="#aaa"
+        />
       </View>
-    </ScrollView>
+
+      <View style={styles.inputContainer}>
+        <Ionicons name="lock-closed" size={24} color="#008584" />
+        <TextInput
+          style={styles.input}
+          placeholder="Digite sua senha..."
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          placeholderTextColor="#aaa"
+        />
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>LOGIN</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity>
+        <Link href="/cadastro">
+          <Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se</Text>
+        </Link>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#008584',
-    padding: 16,
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#008584',
+    padding: 20,
   },
   image: {
     width: '100%',
     height: 200,
     resizeMode: 'contain',
   },
-  section: {
-    marginVertical: 20,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 10,
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 10,
-    marginHorizontal: 10,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+  inputContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  item: {
-    marginTop: 5,
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
-  },
-  link: {
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 20,
     width: '100%',
+    height: 50,
+  },
+  input: {
+    flex: 1,
+    paddingLeft: 10,
+    color: '#333',
   },
   button: {
-    backgroundColor: '#006666',
-    padding: 15,
+    backgroundColor: '#004d4d',
+    paddingVertical: 15,
+    width: '100%',
     borderRadius: 5,
-    alignItems: 'center',
-    marginVertical: 20,
-    elevation: 5,
+    marginBottom: 20,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    textAlign: 'center',
     fontWeight: 'bold',
+    fontSize: 16,
   },
-  tipsList: {
-    paddingBottom: 20,
+  registerText: {
+    color: '#fff',
+    textDecorationLine: 'underline',
   },
 });

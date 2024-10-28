@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router'; // Importando useRouter para navegação
 
-export default function App() {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter(); // Inicializando o router
 
   const handleLogin = () => {
     if (email === 'admin@example.com' && password === 'password123') {
       Alert.alert('Login Successful', 'Welcome back!');
+      router.push('/tabs'); // Redirecionar para a tela de tabs após o login
     } else {
       Alert.alert('Login Failed', 'Invalid email or password');
     }
@@ -17,7 +19,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={require('@/assets/images/logo.png')} />
+      {/* <Image style={styles.image} source={require('@/assets/images/logo.png')} /> */}
 
       <View style={styles.inputContainer}>
         <Ionicons name="mail" size={24} color="#008584" />
@@ -34,7 +36,6 @@ export default function App() {
 
       <View style={styles.inputContainer}>
         <Ionicons name="lock-closed" size={24} color="#008584" />
-
         <TextInput
           style={styles.input}
           placeholder="Digite sua senha..."
@@ -49,8 +50,8 @@ export default function App() {
         <Text style={styles.buttonText}>LOGIN</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => Alert.alert('Cadastro')}>
-      <Link href="/cadastro"><Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se</Text></Link>
+      <TouchableOpacity>
+        <Link href="/cadastro"><Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se</Text></Link>
       </TouchableOpacity>
     </View>
   );
