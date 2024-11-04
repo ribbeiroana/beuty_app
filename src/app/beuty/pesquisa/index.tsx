@@ -1,12 +1,13 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, ScrollView, Text, View, TextInput, FlatList, Image, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, ScrollView, Text, View, TextInput, FlatList, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App: React.FC = () => {
   const [search, setSearch] = useState('');
   const [salons, setSalons] = useState([]);
+  const [loading, setLoading] = useState(true); // Estado de carregamento
   const router = useRouter();
 
   useEffect(() => {
@@ -35,6 +36,8 @@ const App: React.FC = () => {
       } catch (error) {
         console.error('Erro ao buscar salões:', error);
         Alert.alert('Erro', 'Não foi possível buscar os salões.');
+      } finally {
+        setLoading(false); // Finaliza o carregamento após a busca
       }
     };
 
@@ -46,8 +49,6 @@ const App: React.FC = () => {
   );
 
   const handleSalonPress = async (id) => {
-    console.log('ID do salão:', id);
-
     if (id === undefined) {
       Alert.alert('Erro', 'ID do salão não encontrado.');
       return;
@@ -62,6 +63,15 @@ const App: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FFFFFF" />
+        <Text style={styles.loadingText}>Carregando salões...</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
@@ -72,6 +82,7 @@ const App: React.FC = () => {
           value={search}
           onChangeText={text => setSearch(text)}
         />
+        
         <FlatList
           data={filteredSalons}
           keyExtractor={item => item.id.toString()}
@@ -84,7 +95,7 @@ const App: React.FC = () => {
               </View>
               <TouchableOpacity 
                 style={styles.salonButton} 
-                onPress={() => handleSalonPress(item.id)}  // Passa somente o id do salão
+                onPress={() => handleSalonPress(item.id)}
               >
                 <Text style={styles.salonButtonText}>VER DETALHES</Text>
               </TouchableOpacity>
@@ -104,10 +115,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#007B7A',
     padding: 20,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#007B7A',
+  },
+  loadingText: {
+    color: '#FFFFFF',
+    marginTop: 10,
+  },
   headerText: {
     color: '#FFFFFF',
     fontSize: 18,
     textAlign: 'center',
+    fontWeight: 600,
     marginBottom: 20,
   },
   searchInput: {

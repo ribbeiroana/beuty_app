@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, StyleSheet, Pressable, Text, Image, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Pressable, Text, Image, Alert, ActivityIndicator } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
@@ -12,8 +12,9 @@ const SalaoDetails = () => {
   const [servicoSelecionado, setServicoSelecionado] = useState('');
   const [horariosSelecionados, setHorariosSelecionados] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingServicos, setLoadingServicos] = useState(true); // Estado para carregamento de serviços
   const [userId, setUserId] = useState(null);
-  const [isFavorito, setIsFavorito] = useState(false); // Estado para verificar se é favorito
+  const [isFavorito, setIsFavorito] = useState(false);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -48,7 +49,7 @@ const SalaoDetails = () => {
 
         const data = await response.json();
         setSalao(data);
-
+console.log(data);
         // Verificar se o salão é favorito
         const favoritosResponse = await fetch('https://beauty-api-private.onrender.com/favoritos', {
           headers: {
@@ -57,7 +58,7 @@ const SalaoDetails = () => {
         });
 
         const favoritosData = await favoritosResponse.json();
-        setIsFavorito(favoritosData.some(f => f.salao.id === data.id)); // Verifica se o salão está na lista de favoritos
+        setIsFavorito(favoritosData.some(f => f.salao.id === data.id));
 
         // Agora buscar os serviços do salão
         const servicosResponse = await fetch(`https://beauty-api-private.onrender.com/salao/${selectedSalonId}/servicos`, {
@@ -82,6 +83,38 @@ const SalaoDetails = () => {
 
     fetchSalaoDetails();
   }, []);
+
+  useEffect(() => {
+    if (salao) {
+      setLoadingServicos(true); // Começa a carregar os serviços
+      const fetchServicos = async () => {
+        try {
+          const token = await AsyncStorage.getItem('authToken');
+          const selectedSalonId = await AsyncStorage.getItem('selectedSalonId');
+
+          const servicosResponse = await fetch(`https://beauty-api-private.onrender.com/salao/${selectedSalonId}/servicos`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (!servicosResponse.ok) {
+            throw new Error('Erro ao buscar os serviços do salão');
+          }
+
+          const servicosData = await servicosResponse.json();
+          setServicos(servicosData);
+        } catch (error) {
+          console.error('Erro ao buscar serviços:', error);
+          Alert.alert('Erro', 'Não foi possível buscar os serviços do salão.');
+        } finally {
+          setLoadingServicos(false); // Finaliza o carregamento de serviços
+        }
+      };
+
+      fetchServicos();
+    }
+  }, [salao]);
 
   const fetchHorarios = async (servicoId) => {
     try {
@@ -117,7 +150,7 @@ const SalaoDetails = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          salaoId: parseInt(selectedSalonId), // Certifique-se que é um número
+          salaoId: parseInt(selectedSalonId),
         }),
       });
 
@@ -127,7 +160,7 @@ const SalaoDetails = () => {
         return;
       }
 
-      setIsFavorito(true); // Atualiza o estado para indicar que agora é favorito
+      setIsFavorito(true);
       Alert.alert('Sucesso', 'Salão adicionado aos favoritos!');
     } catch (error) {
       console.error('Erro ao adicionar salão aos favoritos:', error);
@@ -180,7 +213,12 @@ const SalaoDetails = () => {
   };
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#ecf3f3" />
+        <Text style={styles.loadingText}>Carregando informações...</Text>
+      </View>
+    );
   }
 
   if (!salao) {
@@ -194,7 +232,7 @@ const SalaoDetails = () => {
           <Image source={{ uri: salao.atendente.foto }} style={styles.logo} />
           <Text style={styles.salaoNome}>{salao.nome}</Text>
           <Pressable onPress={adicionarFavorito} style={styles.favoritoButton}>
-            <FontAwesome name={isFavorito ? 'heart' : 'heart-o'} size={40} color="white" /> {/* Tamanho aumentado e cor branca */}
+            <FontAwesome name={isFavorito ? 'heart' : 'heart-o'} size={40} color="white" />
           </Pressable>
         </View>
 
@@ -207,12 +245,19 @@ const SalaoDetails = () => {
           <Text style={styles.servico}>Serviços</Text>
         </View>
 
-        {servicos.map((servico, index) => (
-          <Pressable key={index} style={styles.servicoItem} onPress={() => selecionarServico(servico)}>
-            <Text style={styles.servicoNome}>{servico.nome} - R$ {servico.valor.toFixed(2)}</Text>
-            <Text style={styles.servicoDescricao}>{servico.descricao}</Text>
-          </Pressable>
-        ))}
+        {loadingServicos ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#ecf3f3" />
+            <Text style={styles.loadingText}>Carregando serviços...</Text>
+          </View>
+        ) : (
+          servicos.map((servico, index) => (
+            <Pressable key={index} style={styles.servicoItem} onPress={() => selecionarServico(servico)}>
+              <Text style={styles.servicoNome}>{servico.nome} - R$ {servico.valor.toFixed(2)}</Text>
+              <Text style={styles.servicoDescricao}>{servico.descricao}</Text>
+            </Pressable>
+          ))
+        )}
 
         {horariosVisiveis && (
           <View style={styles.card}>
@@ -235,6 +280,16 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#008584',
+  },
+  loadingText: {
+    color: 'white',
+    marginTop: 10,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -250,7 +305,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '800',
     fontSize: 30,
-    flex: 1, // Para que o nome do salão ocupe o espaço restante
+    flex: 1,
   },
   favoritoButton: {
     marginLeft: 10,

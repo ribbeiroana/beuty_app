@@ -1,8 +1,10 @@
-import React, { useRef } from 'react';
-import { View, StyleSheet, Image, Pressable, Text, ScrollView, FlatList, Animated } from 'react-native';
+import 'react-native-gesture-handler';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Image, Pressable, Text, ScrollView, FlatList, Animated, ActivityIndicator, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { Link } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const services = [
   { id: '1', name: 'Corte de Cabelo' },
@@ -21,8 +23,8 @@ const beautyTips = [
 ];
 
 export default function Home() {
-  const fadeAnim = new Animated.Value(0);
-  const scaleAnim = useRef(new Animated.Value(1)).current;  // Adiciona referência para animação de escala
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [loading, setLoading] = useState(true); // Adiciona estado de carregamento
 
   const animateTips = () => {
     Animated.timing(fadeAnim, {
@@ -32,24 +34,21 @@ export default function Home() {
     }).start();
   };
 
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.95,
-      friction: 3,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      friction: 3,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  React.useEffect(() => {
+  useEffect(() => {
     animateTips();
+    // Simula um carregamento de dados
+    const loadTips = async () => {
+      try {
+        // Simula um tempo de carregamento (ex: fetch de dados)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setLoading(false); // Define loading como false após o "carregamento"
+      } catch (error) {
+        console.error('Erro ao carregar dicas:', error);
+        Alert.alert('Erro', 'Não foi possível carregar as dicas de beleza.');
+      }
+    };
+
+    loadTips();
   }, []);
 
   return (
@@ -75,32 +74,34 @@ export default function Home() {
 
         {/* Link para Agendar Horário */}
         <Link href="./pesquisa" style={styles.link}>
-          {/* <Animated.View style={{ transform: [{ scale: scaleAnim }] }}> */}
-            <Pressable
-              onPressIn={handlePressIn}
-              onPressOut={handlePressOut}
-            >
-              <View style={styles.button}>
-                <Text style={styles.buttonText}>Agendar um Horário</Text>
-              </View>
-            </Pressable>
-          {/* </Animated.View> */}
+          <Pressable>
+            <View style={styles.button}>
+              <Text style={styles.buttonText}>Agendar um Horário</Text>
+            </View>
+          </Pressable>
         </Link>
 
         {/* Seção de Dicas de Beleza */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Dicas de Beleza</Text>
-          <FlatList
-            data={beautyTips}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Animated.View style={[styles.card, { opacity: fadeAnim, transform: [{ translateX: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [100, 0] }) }] }]}>
-                <AntDesign name="heart" size={24} color="#008584" />
-                <Text style={styles.item}>{item.tip}</Text>
-              </Animated.View>
-            )}
-            contentContainerStyle={styles.tipsList}
-          />
+          {loading ? (
+            <ActivityIndicator size="large" color="#FFFFFF" />
+          ) : (
+            <FlatList
+              data={beautyTips}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <Animated.View style={[styles.card, { 
+                  opacity: fadeAnim, 
+                  transform: [{ translateX: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [100, 0] }) }] 
+                }]}>
+                  <AntDesign name="heart" size={24} color="#008584" />
+                  <Text style={styles.item}>{item.tip}</Text>
+                </Animated.View>
+              )}
+              contentContainerStyle={styles.tipsList}
+            />
+          )}
         </View>
       </View>
     </ScrollView>
@@ -148,14 +149,12 @@ const styles = StyleSheet.create({
   },
   link: {
     width: '100%',
-    
   },
   button: {
     backgroundColor: '#006666',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
-    display: 'flex',
     elevation: 5,
   },
   buttonText: {

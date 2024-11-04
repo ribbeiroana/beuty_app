@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Image, Pressable, ScrollView, Alert } from 'react-native';
+import { Text, View, StyleSheet, Image, Pressable, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -83,7 +83,12 @@ export default function Favoritos() {
   }, [token]);
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#ecf3f3" />
+        <Text style={styles.loadingText}>Carregando favoritos...</Text>
+      </View>
+    );
   }
 
   return (
@@ -124,6 +129,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#008584',
     padding: 20,
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#008584',
+  },
+  loadingText: {
+    color: 'white',
+    marginTop: 10,
   },
   card: {
     backgroundColor: '#fff',
@@ -173,12 +188,12 @@ const styles = StyleSheet.create({
   removerButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 5, // Reduzido para ajustar o tamanho do botão
-    borderRadius: 5, // Menor para deixar mais compacto
+    padding: 5,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: '#008584',
     marginTop: 10,
-    alignSelf: 'flex-start', // Alinha o botão ao início da linha
+    alignSelf: 'flex-start',
   },
   removerTexto: {
     color: '#008584',

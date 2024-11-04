@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Image, Pressable, ScrollView, Alert } from 'react-native';
+import { Text, View, StyleSheet, Image, Pressable, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -7,6 +7,7 @@ export default function Perfil() {
   const [agendamentos, setAgendamentos] = useState([]);
   const [token, setToken] = useState(null);
   const [nomeUsuario, setNomeUsuario] = useState('');
+  const [loading, setLoading] = useState(true); // Estado de carregamento
 
   // Função para buscar os agendamentos da API
   const buscarAgendamentos = async () => {
@@ -34,8 +35,11 @@ export default function Perfil() {
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao tentar buscar os agendamentos.');
       console.error(error);
+    } finally {
+      setLoading(false); // Finaliza o carregamento após a busca
     }
   };
+
   const confirmarExclusao = (id) => {
     Alert.alert(
       "Confirmação",
@@ -90,9 +94,19 @@ export default function Perfil() {
 
   useEffect(() => {
     if (token) {
+      setLoading(true); // Inicia o carregamento ao buscar agendamentos
       buscarAgendamentos(); // Chama a função ao montar o componente, se o token estiver disponível
     }
   }, [token]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#ecf3f3" />
+        <Text style={styles.loadingText}>Carregando perfil...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -109,21 +123,24 @@ export default function Perfil() {
           <Text style={styles.tituloHistorico}>Histórico de Agendamento</Text>
         </View>
 
-        {agendamentos.map((item) => (
-          <Pressable key={item.id} style={styles.itensAgendados}>
-            <View style={styles.itensContainer}>
-              <Text style={styles.textoServico}>Serviço: {item.servico.nome}</Text>
-              {/* <Text style={styles.textoSalão}>Salão: {item.nome}</Text> */}
-              <Text style={styles.textoValor}>Valor: {item.servico.valor}</Text>
-              <View style={styles.excluirContainer}>
-                <Pressable onPress={() => confirmarExclusao(item.id)} style={styles.excluirButton}>
-                  <Text style={styles.excluirAgendamento}>EXCLUIR</Text>
-                  <FontAwesome6 name="trash-can" size={15} style={styles.excluirIcon} />
-                </Pressable>
+        {agendamentos.length === 0 ? (
+          <Text style={styles.semAgendamentos}>Nenhum agendamento encontrado.</Text>
+        ) : (
+          agendamentos.map((item) => (
+            <Pressable key={item.id} style={styles.itensAgendados}>
+              <View style={styles.itensContainer}>
+                <Text style={styles.textoServico}>Serviço: {item.servico.nome}</Text>
+                <Text style={styles.textoValor}>Valor: R$ {item.servico.valor}</Text>
+                <View style={styles.excluirContainer}>
+                  <Pressable onPress={() => confirmarExclusao(item.id)} style={styles.excluirButton}>
+                    <Text style={styles.excluirAgendamento}>EXCLUIR AGENDAMENTO</Text>
+                    <FontAwesome6 name="trash-can" size={15} style={styles.excluirIcon} />
+                  </Pressable>
+                </View>
               </View>
-            </View>
-          </Pressable>
-        ))}
+            </Pressable>
+          ))
+        )}
       </View>
     </ScrollView>
   );
@@ -134,6 +151,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#008584',
     padding: 20,
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#008584',
+  },
+  loadingText: {
+    color: 'white',
+    marginTop: 10,
   },
   card: {
     backgroundColor: '#fff',
@@ -185,10 +212,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
   },
-  textoSalão: {
-    color: '#0b0c0c',
-    fontSize: 14,
-  },
   textoValor: {
     color: '#0b0c0c',
     fontSize: 14,
@@ -213,5 +236,10 @@ const styles = StyleSheet.create({
   },
   excluirIcon: {
     color: '#008584',
+  },
+  semAgendamentos: {
+    color: 'white',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
