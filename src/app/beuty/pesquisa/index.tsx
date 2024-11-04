@@ -19,7 +19,7 @@ const App: React.FC = () => {
           return;
         }
 
-        const response = await fetch('https://beauty-api-private-1.onrender.com/saloes', {
+        const response = await fetch('https://beauty-api-private.onrender.com/saloes', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -42,15 +42,19 @@ const App: React.FC = () => {
   }, []);
 
   const filteredSalons = salons.filter(salon => 
-    salon.endereco.toLowerCase().includes(search.toLowerCase()) // Filtragem pelo endereço
+    salon.endereco.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSalonPress = async (id: number, atendenteId: number) => {
+  const handleSalonPress = async (id) => {
+    console.log('ID do salão:', id);
+
+    if (id === undefined) {
+      Alert.alert('Erro', 'ID do salão não encontrado.');
+      return;
+    }
+
     try {
       await AsyncStorage.setItem('selectedSalonId', id.toString());
-      await AsyncStorage.setItem('selectedAtendenteId', atendenteId.toString());
-       // Armazenar o ID do salão
-       // Armazenar o ID do atendente para pegar na proxima tela 
       router.push('/detalhes'); // Navegar para a tela de detalhes
     } catch (error) {
       console.error('Erro ao armazenar o ID do salão:', error);
@@ -80,7 +84,7 @@ const App: React.FC = () => {
               </View>
               <TouchableOpacity 
                 style={styles.salonButton} 
-                onPress={() => handleSalonPress(item.id, item.atendenteId)}  // Navegar para a tela de detalhes
+                onPress={() => handleSalonPress(item.id)}  // Passa somente o id do salão
               >
                 <Text style={styles.salonButtonText}>VER DETALHES</Text>
               </TouchableOpacity>

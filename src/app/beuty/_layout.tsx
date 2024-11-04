@@ -25,6 +25,16 @@ export default function Layout() {
       />
 
       <Tabs.Screen
+        name='favoritos/index'
+        options={{
+          title: 'Favoritos',
+          tabBarIcon: ({ focused, size }) => (
+            <FontAwesome name='heart' color={'#008584'} size={size} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name='perfil/index'
         options={{
           title: 'Perfil',

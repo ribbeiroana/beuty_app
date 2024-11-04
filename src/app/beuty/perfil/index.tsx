@@ -1,14 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Image, Pressable, ScrollView, Alert } from 'react-native';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Perfil() {
-  const [agendamentos, setAgendamentos] = useState([
-    { id: 1, servico: 'Cabelo', salao: 'Salão A', valor: 'R$ 100' },
-    { id: 2, servico: 'Manicure', salao: 'Salão B', valor: 'R$ 50' },
-    { id: 3, servico: 'Penteado', salao: 'Salão C', valor: 'R$ 80' },
-  ]);
+  const [agendamentos, setAgendamentos] = useState([]);
+  const [token, setToken] = useState(null);
+  const [nomeUsuario, setNomeUsuario] = useState('');
 
+  // Função para buscar os agendamentos da API
+  const buscarAgendamentos = async () => {
+    if (!token) return;
+
+    try {
+      const response = await fetch('https://beauty-api-private.onrender.com/agendamentos', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        Alert.alert('Erro', data.message || 'Erro ao buscar agendamentos.');
+        return;
+      }
+
+      const data = await response.json();
+      setAgendamentos(data);
+      console.log(data);
+
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar buscar os agendamentos.');
+      console.error(error);
+    }
+  };
   const confirmarExclusao = (id) => {
     Alert.alert(
       "Confirmação",
@@ -20,15 +47,58 @@ export default function Perfil() {
     );
   };
 
-  const excluirAgendamento = (id) => {
-    setAgendamentos(agendamentos.filter(agendamento => agendamento.id !== id));
+  const excluirAgendamento = async (id) => {
+    try {
+      const response = await fetch(`https://beauty-api-private.onrender.com/agendamentos/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        Alert.alert('Erro', data.message || 'Erro ao excluir agendamento.');
+        return;
+      }
+
+      // Atualiza a lista de agendamentos
+      setAgendamentos(agendamentos.filter(agendamento => agendamento.id !== id));
+      Alert.alert('Sucesso', 'Agendamento excluído com sucesso.');
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar excluir o agendamento.');
+      console.error(error);
+    }
   };
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const storedToken = await AsyncStorage.getItem('authToken');
+        const storedNome = await AsyncStorage.getItem('userName'); // Armazene o nome no AsyncStorage após login
+        setToken(storedToken);
+        setNomeUsuario(storedNome);
+      } catch (error) {
+        console.error('Erro ao recuperar os dados do usuário:', error);
+      }
+    };
+
+    getUserData();
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      buscarAgendamentos(); // Chama a função ao montar o componente, se o token estiver disponível
+    }
+  }, [token]);
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         <View style={styles.card}>
-          <Text style={styles.usuario}>Nome Usuário</Text>
+          <Text style={styles.usuario}>{nomeUsuario || 'Nome Usuário'}</Text>
         </View>
 
         <View style={styles.imagemContainer}>
@@ -42,9 +112,9 @@ export default function Perfil() {
         {agendamentos.map((item) => (
           <Pressable key={item.id} style={styles.itensAgendados}>
             <View style={styles.itensContainer}>
-              <Text style={styles.textoServico}>Serviço: {item.servico}</Text>
-              <Text style={styles.textoSalão}>Salão: {item.salao}</Text>
-              <Text style={styles.textoValor}>Valor: {item.valor}</Text>
+              <Text style={styles.textoServico}>Serviço: {item.servico.nome}</Text>
+              {/* <Text style={styles.textoSalão}>Salão: {item.nome}</Text> */}
+              <Text style={styles.textoValor}>Valor: {item.servico.valor}</Text>
               <View style={styles.excluirContainer}>
                 <Pressable onPress={() => confirmarExclusao(item.id)} style={styles.excluirButton}>
                   <Text style={styles.excluirAgendamento}>EXCLUIR</Text>

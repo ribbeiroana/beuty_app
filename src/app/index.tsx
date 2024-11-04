@@ -17,25 +17,28 @@ export default function Login() {
     }
 
     try {
-      const response = await fetch('https://beauty-api-private-1.onrender.com/login', {
+      const response = await fetch('https://beauty-api-private.onrender.com/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, senha: password }),
+        body: JSON.stringify({ email, senha: password }), // Certifique-se de que "senha" é o correto
       });
 
       const data = await response.json();
+      console.log(data); // Para verificar a resposta
 
       if (!response.ok) {
-        Alert.alert('Login Falhou', data.message);
+        Alert.alert('Login Falhou', data.message || 'Erro desconhecido.');
       } else {
-        // Armazenar o token e o ID do usuário
+        // Armazenar o token, ID do usuário e nome do usuário
         await AsyncStorage.setItem('authToken', data.token);
         await AsyncStorage.setItem('userId', data.id.toString()); // Armazena o ID como string
+        await AsyncStorage.setItem('userName', data.nome); // Armazena o nome do usuário
         Alert.alert('Bem-vindo(a)', `Olá, ${data.nome}!`);
         router.push('/beuty'); // Redireciona para a tela de tabs
       }
+      console.log(data.token);
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao tentar fazer login. Por favor, tente novamente.');
       console.error(error);

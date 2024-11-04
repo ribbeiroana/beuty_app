@@ -17,7 +17,7 @@ export default function Cadastro() {
     }
 
     try {
-      const response = await fetch('https://beauty-api-private-1.onrender.com/cadastro', {
+      const response = await fetch('https://beauty-api-private.onrender.com/cadastro', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
