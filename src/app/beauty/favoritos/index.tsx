@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: 'transparent',
     borderWidth: 0,
-    backgroundImage: 'linear-gradient(160deg, #008584 0%, #ffffff 100%)',
+    backgroundImage: 'linear-gradient(160deg, #008584 0%, #caffed 100%)',
   },
   titulo: {
     fontWeight: '800',
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 2,
     backgroundColor: '#008584',
-    backgroundImage: 'linear-gradient(160deg, #008584 0%, #ffffff 100%)',
+    backgroundImage: 'linear-gradient(160deg, #008584 0%, #caffed 100%)',
   },
   textoNome: {
     color: 'white',

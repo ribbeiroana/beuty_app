@@ -28,65 +28,39 @@ const SalaoDetails = () => {
   useEffect(() => {
     const fetchSalaoDetails = async () => {
       try {
-        // Recuperar o token e o ID do salão
         const token = await AsyncStorage.getItem('authToken');
         const selectedSalonId = await AsyncStorage.getItem('selectedSalonId');
 
-        if (!selectedSalonId) {
-          Alert.alert('Erro', 'ID do salão não encontrado.');
+        if (!selectedSalonId || !token) {
+          Alert.alert('Erro', 'ID do salão ou token não encontrados.');
           return;
         }
 
-        if (!token) {
-          Alert.alert('Erro', 'Token de autenticação não encontrado.');
-          return;
+        // Carregar detalhes do salão e verificar favoritos em paralelo
+        const [detalhesResponse, favoritosResponse] = await Promise.all([
+          fetch(`https://beauty-api-private.onrender.com/salao/${selectedSalonId}`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+          }),
+          fetch('https://beauty-api-private.onrender.com/favoritos', {
+            headers: { 'Authorization': `Bearer ${token}` },
+          }),
+        ]);
+
+        if (!detalhesResponse.ok) throw new Error('Erro ao buscar detalhes do salão');
+        const salaoData = await detalhesResponse.json();
+        setSalao(salaoData);
+
+        if (favoritosResponse.ok) {
+          const favoritosData = await favoritosResponse.json();
+          setIsFavorito(favoritosData.some(f => f.salao?.id === salaoData.id));
         }
 
-        console.log('Token e Salon ID:', token, selectedSalonId);
+        // Carregar serviços em segundo plano
+        fetchServicos(selectedSalonId, token);
 
-        // Obter detalhes do salão
-        const response = await fetch(`https://beauty-api-private.onrender.com/salao/${selectedSalonId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`Erro ao buscar detalhes do salão: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        setSalao(data);
-        console.log('Data do salão:', data);
-
-        // Verificar se o salão é favorito
-        const favoritosResponse = await fetch('https://beauty-api-private.onrender.com/favoritos', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const favoritosData = await favoritosResponse.json();
-        if (data) {
-          setIsFavorito(favoritosData.some(f => f.salao?.id === data.id));
-        }
-
-        // Agora buscar os serviços do salão
-        const servicosResponse = await fetch(`https://beauty-api-private.onrender.com/salao/${selectedSalonId}/servicos`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!servicosResponse.ok) {
-          throw new Error('Erro ao buscar os serviços do salão');
-        }
-
-        const servicosData = await servicosResponse.json();
-        setServicos(servicosData);
       } catch (error) {
         console.error('Erro ao buscar detalhes do salão:', error);
-        Alert.alert('Erro', 'Não foi possível buscar os detalhes do salão.');
+        Alert.alert('Erro', 'Não foi possível carregar os detalhes do salão.');
       } finally {
         setLoading(false);
       }
@@ -94,6 +68,30 @@ const SalaoDetails = () => {
 
     fetchSalaoDetails();
   }, []);
+
+  const fetchServicos = async (selectedSalonId, token) => {
+    try {
+      const cachedServicos = await AsyncStorage.getItem(`servicos_${selectedSalonId}`);
+      if (cachedServicos) {
+        setServicos(JSON.parse(cachedServicos)); // Usar cache local, se disponível
+      }
+
+      const response = await fetch(`https://beauty-api-private.onrender.com/salao/${selectedSalonId}/servicos`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error('Erro ao buscar os serviços');
+      const servicosData = await response.json();
+      setServicos(servicosData);
+      await AsyncStorage.setItem(`servicos_${selectedSalonId}`, JSON.stringify(servicosData)); // Armazenar cache local
+
+    } catch (error) {
+      console.error('Erro ao buscar serviços:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os serviços.');
+    } finally {
+      setLoadingServicos(false);
+    }
+  };
 
   const adicionarFavorito = async () => {
     try {
@@ -109,11 +107,9 @@ const SalaoDetails = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          salaoId: parseInt(selectedSalonId),
-        }),
+        body: JSON.stringify({ salaoId: parseInt(selectedSalonId) }),
       });
 
       if (!response.ok) {
@@ -139,15 +135,10 @@ const SalaoDetails = () => {
     try {
       const token = await AsyncStorage.getItem('authToken');
       const response = await fetch(`https://beauty-api-private.onrender.com/servico/${servicoId}/horarios`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` },
       });
 
-      if (!response.ok) {
-        throw new Error('Erro ao buscar os horários');
-      }
-
+      if (!response.ok) throw new Error('Erro ao buscar os horários');
       const data = await response.json();
       setHorariosSelecionados(data);
       setHorariosVisiveis(true);
@@ -208,9 +199,7 @@ const SalaoDetails = () => {
           <View style={styles.card}>
             <Text style={styles.cardTitulo}>Horários disponíveis para {servicoSelecionado}</Text>
             {horariosSelecionados.map((horario, index) => (
-              <Pressable key={index} style={styles.button} onPress={() => confirmarAgendamento(horario)}>
-                <Text style={styles.horarioTexto}>{horario}</Text>
-              </Pressable>
+              <Text key={index}>{horario}</Text>
             ))}
           </View>
         )}
