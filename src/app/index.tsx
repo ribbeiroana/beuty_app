@@ -36,7 +36,7 @@ export default function Login() {
         await AsyncStorage.setItem('userId', data.id.toString()); // Armazena o ID como string
         await AsyncStorage.setItem('userName', data.nome); // Armazena o nome do usuário
         Alert.alert('Bem-vindo(a)', `Olá, ${data.nome}!`);
-        router.push('/beuty'); // Redireciona para a tela de tabs
+        router.push('/beauty'); // Redireciona para a tela de tabs
       }
       console.log(data.token);
     } catch (error) {

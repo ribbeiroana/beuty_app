@@ -7,7 +7,7 @@ export default function Layout() {
       <Tabs.Screen
         name='principal/index'  // Home
         options={{
-          title: 'Home',
+          title: 'Início',
           tabBarIcon: ({ focused, size }) => (
             <FontAwesome name='home' color={'#008584'} size={size} />
           ),

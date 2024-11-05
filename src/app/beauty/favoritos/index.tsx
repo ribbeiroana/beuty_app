@@ -38,46 +38,29 @@ export default function Favoritos() {
 
   // Função para remover um salão dos favoritos
   const removerFavorito = async (salaoId) => {
-    Alert.alert(
-      'Confirmar Remoção',
-      'Você tem certeza que deseja remover este salão dos favoritos?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
+    try {
+      const response = await fetch(`https://beauty-api-private.onrender.com/favoritos/${salaoId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        {
-          text: 'Remover',
-          onPress: async () => {
-            try {
-              const response = await fetch(`https://beauty-api-private.onrender.com/favoritos/${salaoId}`, {
-                method: 'DELETE',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({}), // Corpo vazio
-              });
+      });
 
-              const data = await response.json();
+      const data = await response.json();
 
-              if (!response.ok) {
-                Alert.alert('Erro', data.message || 'Erro ao remover salão dos favoritos.');
-                return;
-              }
+      if (!response.ok) {
+        Alert.alert('Erro', data.message || 'Erro ao remover salão dos favoritos.');
+        return;
+      }
 
-              // Atualiza a lista de favoritos
-              setFavoritos(favoritos.filter(favorito => favorito.id !== salaoId));
-              Alert.alert('Sucesso', 'Salão removido dos favoritos com sucesso.');
-            } catch (error) {
-              Alert.alert('Erro', 'Ocorreu um erro ao tentar remover o salão dos favoritos.');
-              console.error(error);
-            }
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+      // Atualiza a lista de favoritos
+      setFavoritos(favoritos.filter(favorito => favorito.id !== salaoId));
+      Alert.alert('Sucesso', 'Salão removido dos favoritos com sucesso.');
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar remover o salão dos favoritos.');
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -158,7 +141,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   card: {
-    backgroundColor: '#fff',
     height: 80,
     padding: 10,
     borderBottomLeftRadius: 30,
@@ -171,11 +153,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    backgroundImage: 'linear-gradient(160deg, #008584 0%, #ffffff 100%)',
   },
   titulo: {
     fontWeight: '800',
     fontSize: 25,
-    color: '#008584',
+    color: '#ffffff',
+    fontFamily: 'Roboto',
+    textAlign: 'center', // Centraliza o texto (removendo o uppercase)
   },
   imagemContainer: {
     flexDirection: 'row',
@@ -187,38 +174,44 @@ const styles = StyleSheet.create({
     height: 50,
   },
   itensFavoritos: {
-    backgroundColor: '#ffffff',
-    padding: 10,
+    backgroundColor: 'transparent',
+    padding: 15,
     marginVertical: 5,
     borderRadius: 10,
     elevation: 2,
+    backgroundColor: '#008584',
+    backgroundImage: 'linear-gradient(160deg, #008584 0%, #ffffff 100%)',
   },
   textoNome: {
-    color: '#0b0c0c',
-    fontSize: 16,
+    color: 'white',
+    fontSize: 18,
     fontWeight: 'bold',
+    marginLeft: 10,  // Alinhando à esquerda
   },
   textoEndereco: {
-    color: '#0b0c0c',
-    fontSize: 14,
+    color: 'white',
+    fontSize: 16,
+    marginLeft: 10,  // Alinhando à esquerda
   },
   removerButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 5,
+    padding: 7,
     borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#008584',
+    // borderWidth: 1,
+    borderColor: '#ffffff',
+    backgroundColor: '#31a1a1',
     marginTop: 10,
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-start', // Alinha o botão à esquerda
+    marginLeft: 10,  // Alinha o botão à esquerda
   },
   removerTexto: {
-    color: '#008584',
+    color: '#ffffff',
     fontWeight: 'bold',
     marginRight: 5,
   },
   removerIcon: {
-    color: '#008584',
+    color: '#ffffff',
   },
   semFavoritos: {
     color: 'white',

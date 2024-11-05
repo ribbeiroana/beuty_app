@@ -12,7 +12,7 @@ const SalaoDetails = () => {
   const [servicoSelecionado, setServicoSelecionado] = useState('');
   const [horariosSelecionados, setHorariosSelecionados] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingServicos, setLoadingServicos] = useState(true); // Estado para carregamento de serviços
+  const [loadingServicos, setLoadingServicos] = useState(true);
   const [userId, setUserId] = useState(null);
   const [isFavorito, setIsFavorito] = useState(false);
 
@@ -28,6 +28,7 @@ const SalaoDetails = () => {
   useEffect(() => {
     const fetchSalaoDetails = async () => {
       try {
+        // Recuperar o token e o ID do salão
         const token = await AsyncStorage.getItem('authToken');
         const selectedSalonId = await AsyncStorage.getItem('selectedSalonId');
 
@@ -35,6 +36,13 @@ const SalaoDetails = () => {
           Alert.alert('Erro', 'ID do salão não encontrado.');
           return;
         }
+
+        if (!token) {
+          Alert.alert('Erro', 'Token de autenticação não encontrado.');
+          return;
+        }
+
+        console.log('Token e Salon ID:', token, selectedSalonId);
 
         // Obter detalhes do salão
         const response = await fetch(`https://beauty-api-private.onrender.com/salao/${selectedSalonId}`, {
@@ -44,12 +52,13 @@ const SalaoDetails = () => {
         });
 
         if (!response.ok) {
-          throw new Error('Erro ao buscar os detalhes do salão');
+          throw new Error(`Erro ao buscar detalhes do salão: ${response.statusText}`);
         }
 
         const data = await response.json();
         setSalao(data);
-console.log(data);
+        console.log('Data do salão:', data);
+
         // Verificar se o salão é favorito
         const favoritosResponse = await fetch('https://beauty-api-private.onrender.com/favoritos', {
           headers: {
@@ -58,7 +67,9 @@ console.log(data);
         });
 
         const favoritosData = await favoritosResponse.json();
-        setIsFavorito(favoritosData.some(f => f.salao.id === data.id));
+        if (data) {
+          setIsFavorito(favoritosData.some(f => f.salao?.id === data.id));
+        }
 
         // Agora buscar os serviços do salão
         const servicosResponse = await fetch(`https://beauty-api-private.onrender.com/salao/${selectedSalonId}/servicos`, {
@@ -84,64 +95,15 @@ console.log(data);
     fetchSalaoDetails();
   }, []);
 
-  useEffect(() => {
-    if (salao) {
-      setLoadingServicos(true); // Começa a carregar os serviços
-      const fetchServicos = async () => {
-        try {
-          const token = await AsyncStorage.getItem('authToken');
-          const selectedSalonId = await AsyncStorage.getItem('selectedSalonId');
-
-          const servicosResponse = await fetch(`https://beauty-api-private.onrender.com/salao/${selectedSalonId}/servicos`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-
-          if (!servicosResponse.ok) {
-            throw new Error('Erro ao buscar os serviços do salão');
-          }
-
-          const servicosData = await servicosResponse.json();
-          setServicos(servicosData);
-        } catch (error) {
-          console.error('Erro ao buscar serviços:', error);
-          Alert.alert('Erro', 'Não foi possível buscar os serviços do salão.');
-        } finally {
-          setLoadingServicos(false); // Finaliza o carregamento de serviços
-        }
-      };
-
-      fetchServicos();
-    }
-  }, [salao]);
-
-  const fetchHorarios = async (servicoId) => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      const response = await fetch(`https://beauty-api-private.onrender.com/servico/${servicoId}/horarios`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar os horários');
-      }
-
-      const data = await response.json();
-      setHorariosSelecionados(data);
-      setHorariosVisiveis(true);
-    } catch (error) {
-      console.error('Erro ao buscar horários:', error);
-      Alert.alert('Erro', 'Não foi possível buscar os horários disponíveis.');
-    }
-  };
-
   const adicionarFavorito = async () => {
     try {
       const token = await AsyncStorage.getItem('authToken');
       const selectedSalonId = await AsyncStorage.getItem('selectedSalonId');
+
+      if (!token || !selectedSalonId) {
+        Alert.alert('Erro', 'Token de autenticação ou ID do salão não encontrado.');
+        return;
+      }
 
       const response = await fetch('https://beauty-api-private.onrender.com/favoritos', {
         method: 'POST',
@@ -168,48 +130,31 @@ console.log(data);
     }
   };
 
-  const confirmarAgendamento = (horario) => {
-    Alert.alert(
-      "Confirmação de Agendamento",
-      `Você deseja agendar ${servicoSelecionado} para ${horario}?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Confirmar", onPress: () => realizarAgendamento(horario) },
-      ]
-    );
-  };
-
-  const realizarAgendamento = async (horario) => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      const servicoId = servicos.find(servico => servico.nome === servicoSelecionado)?.id;
-
-      const response = await fetch('https://beauty-api-private.onrender.com/agendamentos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          servicoId,
-          dataHora: horario,
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao realizar o agendamento');
-      }
-
-      Alert.alert('Sucesso', 'Agendamento realizado com sucesso!');
-    } catch (error) {
-      console.error('Erro ao realizar agendamento:', error);
-      Alert.alert('Erro', 'Não foi possível realizar o agendamento.');
-    }
-  };
-
   const selecionarServico = (servico) => {
     setServicoSelecionado(servico.nome);
     fetchHorarios(servico.id);
+  };
+
+  const fetchHorarios = async (servicoId) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      const response = await fetch(`https://beauty-api-private.onrender.com/servico/${servicoId}/horarios`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao buscar os horários');
+      }
+
+      const data = await response.json();
+      setHorariosSelecionados(data);
+      setHorariosVisiveis(true);
+    } catch (error) {
+      console.error('Erro ao buscar horários:', error);
+      Alert.alert('Erro', 'Não foi possível buscar os horários disponíveis.');
+    }
   };
 
   if (loading) {

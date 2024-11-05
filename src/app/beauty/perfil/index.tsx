@@ -4,10 +4,11 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Perfil() {
-  const [agendamentos, setAgendamentos] = useState([]);
+  const [agendamentos, setAgendamentos] = useState([]); // Inicializado como um array
   const [token, setToken] = useState(null);
   const [nomeUsuario, setNomeUsuario] = useState('');
   const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [error, setError] = useState(null); // Estado para gerenciar erros
 
   // Função para buscar os agendamentos da API
   const buscarAgendamentos = async () => {
@@ -25,16 +26,29 @@ export default function Perfil() {
       if (!response.ok) {
         const data = await response.json();
         Alert.alert('Erro', data.message || 'Erro ao buscar agendamentos.');
+        setError(data.message || 'Erro ao buscar agendamentos.');
         return;
       }
 
       const data = await response.json();
-      setAgendamentos(data);
-      console.log(data);
+
+      // Garantir que a resposta seja um array
+      if (!Array.isArray(data)) {
+        setError('Sem agendamentos.');
+        setAgendamentos([]); // Certifique-se de que agendamentos seja um array vazio
+      } else if (data.length === 0) {
+        setError('Nenhum agendamento encontrado.');
+        setAgendamentos([]); // Certifique-se de que agendamentos seja um array vazio
+      } else {
+        setAgendamentos(data);
+        setError(null); // Limpa o erro se agendamentos foram encontrados
+      }
 
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao tentar buscar os agendamentos.');
       console.error(error);
+      setError('Ocorreu um erro ao tentar buscar os agendamentos.');
+      setAgendamentos([]); // Assegura que agendamentos é um array vazio em caso de erro
     } finally {
       setLoading(false); // Finaliza o carregamento após a busca
     }
@@ -59,6 +73,7 @@ export default function Perfil() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
+        body: JSON.stringify({}) // Corpo vazio, mas não pode ser "null"
       });
 
       const data = await response.json();
@@ -123,8 +138,8 @@ export default function Perfil() {
           <Text style={styles.tituloHistorico}>Histórico de Agendamento</Text>
         </View>
 
-        {agendamentos.length === 0 ? (
-          <Text style={styles.semAgendamentos}>Nenhum agendamento encontrado.</Text>
+        {error ? (
+          <Text style={styles.semAgendamentos}>{error}</Text> // Exibe a mensagem de erro
         ) : (
           agendamentos.map((item) => (
             <Pressable key={item.id} style={styles.itensAgendados}>
@@ -163,7 +178,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   card: {
-    backgroundColor: '#fff',
     height: 80,
     padding: 10,
     borderBottomLeftRadius: 30,
@@ -175,11 +189,16 @@ const styles = StyleSheet.create({
     elevation: 5,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    backgroundImage: 'linear-gradient(160deg, #008584 0%, #ffffff 100%)',
   },
   usuario: {
     fontWeight: '800',
     fontSize: 25,
-    color: '#008584',
+    color: '#ffffff',
+    fontFamily: 'Roboto',
+    textAlign: 'center', // Centraliza o texto
   },
   imagemContainer: {
     flexDirection: 'row',
@@ -197,24 +216,28 @@ const styles = StyleSheet.create({
     height: 50,
   },
   itensAgendados: {
-    backgroundColor: '#ffffff',
-    padding: 10,
+    backgroundColor: 'transparent',
+    padding: 15,
     marginVertical: 5,
     borderRadius: 10,
     elevation: 2,
+    backgroundColor: '#008584',
+    backgroundImage: 'linear-gradient(160deg, #008584 0%, #ffffff 100%)',
   },
   itensContainer: {
     flexDirection: 'column',
     alignItems: 'flex-start',
   },
   textoServico: {
-    color: '#0b0c0c',
-    fontSize: 15,
+    color: 'white',
+    fontSize: 18,
     fontWeight: 'bold',
+    marginLeft: 10, // Alinhado à esquerda
   },
   textoValor: {
-    color: '#0b0c0c',
-    fontSize: 14,
+    color: 'white',
+    fontSize: 16,
+    marginLeft: 10, // Alinhado à esquerda
     marginBottom: 10,
   },
   excluirContainer: {
@@ -225,17 +248,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 8,
-    borderRadius: 10,
+    borderRadius: 5,
     borderWidth: 1,
-    borderColor: '#008584',
+    borderColor: '#ffffff',
+    marginTop: 10,
+    alignSelf: 'flex-start', // Alinhado à esquerda
+    marginLeft: 10, // Alinhado à esquerda
   },
   excluirAgendamento: {
-    color: '#008584',
+    color: '#ffffff',
     fontWeight: 'bold',
     marginRight: 5,
   },
   excluirIcon: {
-    color: '#008584',
+    color: '#ffffff',
   },
   semAgendamentos: {
     color: 'white',
