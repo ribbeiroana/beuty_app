@@ -4,13 +4,15 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Favoritos() {
-  const [favoritos, setFavoritos] = useState([]);
+  const [favoritos, setFavoritos] = useState([]); // Inicializando favoritos como array vazio
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Função para buscar os salões favoritos da API
   const buscarFavoritos = async () => {
     if (!token) return;
+
+    setLoading(true); // Começa o loading ao iniciar a busca.
 
     try {
       const response = await fetch('https://beauty-api-private.onrender.com/favoritos', {
@@ -24,13 +26,17 @@ export default function Favoritos() {
       if (!response.ok) {
         const data = await response.json();
         Alert.alert('Erro', data.message || 'Erro ao buscar salões favoritos.');
+        setLoading(false); // Finaliza o carregamento
         return;
       }
 
       const data = await response.json();
-      setFavoritos(data);
-      setLoading(false);
+      
+      // Garantir que data seja um array
+      setFavoritos(Array.isArray(data) ? data : []);
+      setLoading(false); // Finaliza o carregamento após dados serem recebidos
     } catch (error) {
+      setLoading(false); // Finaliza o carregamento
       Alert.alert('Erro', 'Ocorreu um erro ao tentar buscar os salões favoritos.');
       console.error(error);
     }
@@ -54,7 +60,7 @@ export default function Favoritos() {
         return;
       }
 
-      // Atualiza a lista de favoritos
+      // Atualiza a lista de favoritos após remoção
       setFavoritos(favoritos.filter(favorito => favorito.id !== salaoId));
       Alert.alert('Sucesso', 'Salão removido dos favoritos com sucesso.');
     } catch (error) {
@@ -78,7 +84,7 @@ export default function Favoritos() {
 
   useEffect(() => {
     if (token) {
-      buscarFavoritos(); // Chama a função ao montar o componente, se o token estiver disponível
+      buscarFavoritos(); // Chama a função de busca assim que o token estiver disponível
     }
   }, [token]);
 
@@ -105,7 +111,7 @@ export default function Favoritos() {
           />
         </View>
 
-        {favoritos.length === 0 ? (
+        {favoritos && favoritos.length === 0 ? (
           <Text style={styles.semFavoritos}>Nenhum salão favorito encontrado.</Text>
         ) : (
           favoritos.map((salao) => (

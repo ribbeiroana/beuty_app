@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router'; // Importando useRouter
 
@@ -43,7 +43,7 @@ export default function Cadastro() {
 
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={require('@/assets/images/logo.png')} />
+      <Image resizeMode="contain" style={styles.image} source={require('@/assets/images/logo.png')} />
 
       <View style={styles.inputContainer}>
         <Icon name="person" size={20} color="#008584" style={styles.icon} />
@@ -63,7 +63,7 @@ export default function Cadastro() {
           placeholder="Digite seu email"
           value={email}
           onChangeText={setEmail}
-          keyboardType="email-address"
+          inputMode="email"  // Substituído keyboardType por inputMode
           autoCapitalize="none"
           placeholderTextColor="#aaa"
         />
@@ -81,9 +81,9 @@ export default function Cadastro() {
         />
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+      <Pressable style={styles.button} onPress={handleCadastro}>
         <Text style={styles.buttonText}>CADASTRAR</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 200,
-    resizeMode: 'contain',
+    resizeMode: 'contain',  // Ajustado o uso de resizeMode
   },
   inputContainer: {
     flexDirection: 'row',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Link } from 'expo-router';
@@ -34,7 +34,7 @@ export default function Login() {
         // Armazenar o token, ID do usuário e nome do usuário
         await AsyncStorage.setItem('authToken', data.token);
         await AsyncStorage.setItem('userId', data.id.toString()); // Armazena o ID como string
-        await AsyncStorage.setItem('userName', data.nome); // Armazena o nome do usuário
+        await AsyncStorage.setItem('userName', data.nome); // Armazenar o nome do usuário
         Alert.alert('Bem-vindo(a)', `Olá, ${data.nome}!`);
         router.push('/beauty'); // Redireciona para a tela de tabs
       }
@@ -47,7 +47,7 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Image style={styles.image} source={require('@/assets/images/logo.png')} />
+      <Image resizeMode="contain" style={styles.image} source={require('@/assets/images/logo.png')} />
 
       <View style={styles.inputContainer}>
         <Ionicons name="mail" size={24} color="#008584" />
@@ -56,7 +56,7 @@ export default function Login() {
           placeholder="Digite seu email..."
           value={email}
           onChangeText={setEmail}
-          keyboardType="email-address"
+          inputMode="email" // Substituído keyboardType por inputMode
           autoCapitalize="none"
           placeholderTextColor="#aaa"
         />
@@ -74,15 +74,15 @@ export default function Login() {
         />
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <Pressable style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>LOGIN</Text>
-      </TouchableOpacity>
+      </Pressable>
 
-      <TouchableOpacity>
+      <Pressable>
         <Link href="/cadastro">
           <Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se</Text>
         </Link>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
