@@ -37,7 +37,7 @@ O **Beauty App** é um aplicativo desenvolvido para ajudar os usuários a encont
   
 **Clone o repositório:**:
 ```bash
-git clone 
+git clone https://github.com/ribbeiroana/refatoramento.git
 ```
 
 **Instale as dependências:**:
