@@ -31,7 +31,7 @@ O **Beauty App** é um aplicativo desenvolvido para ajudar os usuários a encont
 ### Pré-requisitos
 
 - **Node.js**: Você precisará do Node.js instalado para rodar o projeto. Se ainda não o instalou, pode baixar [aqui](https://nodejs.org/).
-- **Expo**: Ferramenta para facilitar o desenvolvimento de aplicativos React Native. Você pode instalar o Expo CLI globalmente com o seguinte comando:
+- **Expo**: Ferramenta para facilitar o desenvolvimento de aplicativos React Native. 
 
 ```bash
 npm install
