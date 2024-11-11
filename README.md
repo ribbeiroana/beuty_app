@@ -35,4 +35,13 @@ O **Beauty App** é um aplicativo desenvolvido para ajudar os usuários a encont
 
 ```bash
 npm install
+```
+**Inicie o servidor de desenvolvimento**:
 
+   ```bash
+   npm start
+```
+### Emuladores
+Para testar o aplicativo em um emulador Android ou iOS, utilize o Expo para emular o aplicativo em dispositivos móveis no seu computador.
+
+- **IOS / Android**:  Use o comando npm start e aponte seu celular para o Qrcode
