@@ -31,17 +31,26 @@ O **Beauty App** é um aplicativo desenvolvido para ajudar os usuários a encont
 ### Pré-requisitos
 
 - **Node.js**: Você precisará do Node.js instalado para rodar o projeto. Se ainda não o instalou, pode baixar [aqui](https://nodejs.org/).
-- **Expo**: Ferramenta para facilitar o desenvolvimento de aplicativos React Native. 
+- **npm**: (geralmente já incluído com o Node.js).
+- **Expo**: Ferramenta para facilitar o desenvolvimento de aplicativos React Native.
+- **Expo Go**: Instalado no seu celular / necessário criar uma conta.
+  
+**Clone o repositório:**:
+```bash
+git clone 
+```
 
+**Instale as dependências:**:
 ```bash
 npm install
 ```
-**Inicie o servidor de desenvolvimento**:
 
+**Inicie o servidor de desenvolvimento**:
    ```bash
    npm start
 ```
-### Emuladores
-Para testar o aplicativo em um emulador Android ou iOS, utilize o Expo para emular o aplicativo em dispositivos móveis no seu computador.
 
-- **IOS / Android**:  Use o comando npm start e aponte seu celular para o Qrcode
+### Emuladores
+Para testar o aplicativo em um emulador Android ou iOS, utilize o Expo para emular o aplicativo em dispositivos móveis.
+
+- **IOS / Android**:  Use o comando npm start e aponte seu celular para o Qrcode.
