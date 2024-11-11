@@ -3,18 +3,39 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TextInput, FlatList, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Location from 'expo-location'; // Importar o Expo Location
 
 const App: React.FC = () => {
   const [search, setSearch] = useState('');
   const [salons, setSalons] = useState([]);
   const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [location, setLocation] = useState(null); // Para armazenar a localização do usuário
   const router = useRouter();
 
+  // Função para obter a localização atual
+  const getLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync(); // Solicitar permissão de localização
+      if (status !== 'granted') {
+        Alert.alert('Permissão negada', 'Não foi possível acessar a sua localização.');
+        return;
+      }
+
+      const loc = await Location.getCurrentPositionAsync({});
+      setLocation(loc.coords); // Salvar as coordenadas
+    } catch (error) {
+      console.error('Erro ao obter a localização:', error);
+      Alert.alert('Erro', 'Não foi possível obter a localização.');
+    }
+  };
+
   useEffect(() => {
+    // Chama a função de localização quando o componente é montado
+    getLocation();
+
     const fetchSalons = async () => {
       try {
         const token = await AsyncStorage.getItem('authToken');
-
         if (!token) {
           Alert.alert('Erro', 'Token de autenticação não encontrado.');
           return;
@@ -37,16 +58,34 @@ const App: React.FC = () => {
         console.error('Erro ao buscar salões:', error);
         Alert.alert('Erro', 'Não foi possível buscar os salões.');
       } finally {
-        setLoading(false); // Finaliza o carregamento após a busca
+        setLoading(false);
       }
     };
 
     fetchSalons();
   }, []);
 
-  const filteredSalons = salons.filter(salon => 
-    salon.endereco.toLowerCase().includes(search.toLowerCase())
-  );
+  // Função para calcular a distância entre duas coordenadas
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Raio da Terra em km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Retorna a distância em km
+  };
+
+  const filteredSalons = salons.filter(salon => {
+    if (!location) return true; // Se não tivermos a localização, exibe todos os salões
+
+    const salonCoords = salon.coords; // Supondo que os salões tenham coordenadas (latitude, longitude)
+    if (!salonCoords) return true; // Caso não tenha coordenadas, exibe o salão
+
+    const distance = calculateDistance(location.latitude, location.longitude, salonCoords.latitude, salonCoords.longitude);
+    return distance <= 5; // Filtra os salões até 5 km de distância
+  });
 
   const handleSalonPress = async (id) => {
     if (id === undefined) {
@@ -56,7 +95,7 @@ const App: React.FC = () => {
 
     try {
       await AsyncStorage.setItem('selectedSalonId', id.toString());
-      router.push('/detalhes'); // Navegar para a tela de detalhes
+      router.push('/detalhes');
     } catch (error) {
       console.error('Erro ao armazenar o ID do salão:', error);
       Alert.alert('Erro', 'Não foi possível armazenar o ID do salão.');
@@ -74,18 +113,17 @@ const App: React.FC = () => {
 
   return (
     <FlatList
-      contentContainerStyle={styles.container}  // Usando FlatList para a rolagem
+      contentContainerStyle={styles.container}
       data={filteredSalons}
       keyExtractor={item => item.id.toString()}
       ListHeaderComponent={() => (
         <>
           <Text style={styles.headerText}>ENCONTRE O ATENDIMENTO MAIS PERTO DE VOCÊ...</Text>
           
-          {/* Campo de busca */}
           <TextInput
             style={styles.searchInput}
             placeholder="Digite o endereço do salão..."
-            placeholderTextColor="#777777"  // Cor do texto do placeholder
+            placeholderTextColor="#777777"
             value={search}
             onChangeText={text => setSearch(text)}
           />
@@ -122,7 +160,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#007B7A',  // Manter o fundo enquanto carrega
+    backgroundColor: '#007B7A',
   },
   loadingText: {
     color: '#FFFFFF',
@@ -141,13 +179,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 20,
-    color: '#333333',  // Cor do texto digitado
-    fontSize: 16,  // Tamanho do texto
-    elevation: 3,  // Para um leve efeito de sombra no Android
-    shadowColor: '#000',  // Para iOS (sombra)
-    shadowOffset: { width: 0, height: 2 },  // Configura a posição da sombra
-    shadowOpacity: 0.2,  // Opacidade da sombra
-    shadowRadius: 3,  // Tamanho da sombra
+    color: '#333333',
+    fontSize: 16,
   },
   salonContainer: {
     backgroundColor: '#FFFFFF',

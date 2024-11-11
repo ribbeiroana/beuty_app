@@ -52,9 +52,15 @@ const SalaoDetails = () => {
         const salaoData = await detalhesResponse.json();
         setSalao(salaoData);
 
+        // Verificando se favoritosData é um array válido
         if (favoritosResponse.ok) {
           const favoritosData = await favoritosResponse.json();
-          setIsFavorito(favoritosData.some(f => f.salao?.id === salaoData.id));
+          // Garantir que favoritosData é um array antes de chamar .some
+          if (Array.isArray(favoritosData)) {
+            setIsFavorito(favoritosData.some(f => f.salao?.id === salaoData.id));
+          } else {
+            setIsFavorito(false); // Se não for array, não é favorito
+          }
         }
 
         fetchServicos(selectedSalonId, token);

@@ -4,7 +4,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Favoritos() {
-  const [favoritos, setFavoritos] = useState([]);
+  const [favoritos, setFavoritos] = useState([]); // Inicializa como array vazio
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,15 +24,18 @@ export default function Favoritos() {
       if (!response.ok) {
         const data = await response.json();
         Alert.alert('Erro', data.message || 'Erro ao buscar salões favoritos.');
+        setFavoritos([]);  // Em caso de erro, limpar favoritos
         return;
       }
 
       const data = await response.json();
-      setFavoritos(data);
+      // Verificar se data é um array e, caso contrário, definir como array vazio
+      setFavoritos(Array.isArray(data) ? data : []);
       setLoading(false);
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao tentar buscar os salões favoritos.');
       console.error(error);
+      setFavoritos([]);  // Em caso de erro, limpar favoritos
     }
   };
 
@@ -66,7 +69,7 @@ export default function Favoritos() {
                 return;
               }
 
-              // Atualiza a lista de favoritos
+              // Atualiza a lista de favoritos localmente
               setFavoritos(favoritos.filter(favorito => favorito.id !== salaoId));
               Alert.alert('Sucesso', 'Salão removido dos favoritos com sucesso.');
             } catch (error) {
@@ -78,6 +81,34 @@ export default function Favoritos() {
       ],
       { cancelable: false }
     );
+  };
+
+  // Função para adicionar um salão aos favoritos
+  const adicionarFavorito = async (salaoId) => {
+    try {
+      const response = await fetch('https://beauty-api-private.onrender.com/favoritos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ salaoId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        Alert.alert('Erro', data.message || 'Erro ao adicionar salão aos favoritos.');
+        return;
+      }
+
+      // Atualiza a lista de favoritos localmente (adiciona o novo salão à lista)
+      setFavoritos([...favoritos, data]);
+      Alert.alert('Sucesso', 'Salão adicionado aos favoritos com sucesso.');
+    } catch (error) {
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar adicionar o salão aos favoritos.');
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -122,7 +153,8 @@ export default function Favoritos() {
           />
         </View>
 
-        {favoritos.length === 0 ? (
+        {/* Exibe a mensagem "Nenhum salão favorito encontrado" se não houver favoritos */}
+        {Array.isArray(favoritos) && favoritos.length === 0 ? (
           <Text style={styles.semFavoritos}>Nenhum salão favorito encontrado.</Text>
         ) : (
           favoritos.map((salao) => (
