@@ -4,13 +4,13 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Perfil() {
-  const [agendamentos, setAgendamentos] = useState([]); // Inicializado como um array
+  const [agendamentos, setAgendamentos] = useState([]); 
   const [token, setToken] = useState(null);
   const [nomeUsuario, setNomeUsuario] = useState('');
-  const [loading, setLoading] = useState(true); // Estado de carregamento
-  const [error, setError] = useState(null); // Estado para gerenciar erros
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null); 
 
-  // Função para buscar os agendamentos da API
+
   const buscarAgendamentos = async () => {
     if (!token) return;
 
@@ -32,25 +32,25 @@ export default function Perfil() {
 
       const data = await response.json();
 
-      // Garantir que a resposta seja um array
+ 
       if (!Array.isArray(data)) {
         setError('Sem agendamentos.');
-        setAgendamentos([]); // Certifique-se de que agendamentos seja um array vazio
+        setAgendamentos([]); 
       } else if (data.length === 0) {
         setError('Nenhum agendamento encontrado.');
-        setAgendamentos([]); // Certifique-se de que agendamentos seja um array vazio
+        setAgendamentos([]); 
       } else {
         setAgendamentos(data);
-        setError(null); // Limpa o erro se agendamentos foram encontrados
+        setError(null); 
       }
 
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao tentar buscar os agendamentos.');
       console.error(error);
       setError('Ocorreu um erro ao tentar buscar os agendamentos.');
-      setAgendamentos([]); // Assegura que agendamentos é um array vazio em caso de erro
+      setAgendamentos([]); 
     } finally {
-      setLoading(false); // Finaliza o carregamento após a busca
+      setLoading(false); 
     }
   };
 
@@ -73,7 +73,7 @@ export default function Perfil() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({}) // Corpo vazio, mas não pode ser "null"
+        body: JSON.stringify({}) 
       });
 
       const data = await response.json();
@@ -83,7 +83,7 @@ export default function Perfil() {
         return;
       }
 
-      // Atualiza a lista de agendamentos
+     
       setAgendamentos(agendamentos.filter(agendamento => agendamento.id !== id));
       Alert.alert('Sucesso', 'Agendamento excluído com sucesso.');
     } catch (error) {
@@ -96,7 +96,7 @@ export default function Perfil() {
     const getUserData = async () => {
       try {
         const storedToken = await AsyncStorage.getItem('authToken');
-        const storedNome = await AsyncStorage.getItem('userName'); // Armazene o nome no AsyncStorage após login
+        const storedNome = await AsyncStorage.getItem('userName'); 
         setToken(storedToken);
         setNomeUsuario(storedNome);
       } catch (error) {
@@ -109,8 +109,8 @@ export default function Perfil() {
 
   useEffect(() => {
     if (token) {
-      setLoading(true); // Inicia o carregamento ao buscar agendamentos
-      buscarAgendamentos(); // Chama a função ao montar o componente, se o token estiver disponível
+      setLoading(true); 
+      buscarAgendamentos(); 
     }
   }, [token]);
 
@@ -132,14 +132,14 @@ export default function Perfil() {
 
         <View style={styles.imagemContainer}>
           <Image 
-            source={require('@/assets/images/designEstrela.png')} // Ajuste o caminho da imagem
+            source={require('@/assets/images/designEstrela.png')} 
             style={styles.estrelaImagem} 
           />
           <Text style={styles.tituloHistorico}>Histórico de Agendamento</Text>
         </View>
 
         {error ? (
-          <Text style={styles.semAgendamentos}>{error}</Text> // Exibe a mensagem de erro
+          <Text style={styles.semAgendamentos}>{error}</Text> 
         ) : (
           agendamentos.map((item) => (
             <Pressable key={item.id} style={styles.itensAgendados}>
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: '#ffffff',
     fontFamily: 'Roboto',
-    textAlign: 'center', // Centraliza o texto
+    textAlign: 'center', 
   },
   imagemContainer: {
     flexDirection: 'row',
@@ -233,12 +233,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-    marginLeft: 10, // Alinhado à esquerda
+    marginLeft: 10, 
   },
   textoValor: {
     color: 'white',
     fontSize: 16,
-    marginLeft: 10, // Alinhado à esquerda
+    marginLeft: 10,
     marginBottom: 10,
   },
   excluirContainer: {
@@ -253,8 +253,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ffffff',
     marginTop: 10,
-    alignSelf: 'flex-start', // Alinhado à esquerda
-    marginLeft: 10, // Alinhado à esquerda
+    alignSelf: 'flex-start', 
+    marginLeft: 10, 
   },
   excluirAgendamento: {
     color: '#ffffff',

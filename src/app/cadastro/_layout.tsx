@@ -4,14 +4,14 @@ import { TouchableOpacity } from 'react-native';
 import { useNavigation } from 'expo-router';
 
 export default function Layout() {
-  const navigation = useNavigation();  // Para navegar para a tela anterior
+  const navigation = useNavigation();  
 
   return (
     <Stack>
       <Stack.Screen
-        name="index"  // Nome da tela
+        name="index"  
         options={{
-          title: 'Cadastro', // Título do header
+          title: 'Cadastro', 
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <FontAwesome name="arrow-left" size={24} color="#000" />

@@ -3,26 +3,26 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TextInput, FlatList, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Location from 'expo-location'; // Importar o Expo Location
+import * as Location from 'expo-location'; 
 
 const App: React.FC = () => {
   const [search, setSearch] = useState('');
   const [salons, setSalons] = useState([]);
-  const [loading, setLoading] = useState(true); // Estado de carregamento
-  const [location, setLocation] = useState(null); // Para armazenar a localização do usuário
+  const [loading, setLoading] = useState(true); 
+  const [location, setLocation] = useState(null); 
   const router = useRouter();
 
-  // Função para obter a localização atual
+
   const getLocation = async () => {
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync(); // Solicitar permissão de localização
+      const { status } = await Location.requestForegroundPermissionsAsync(); 
       if (status !== 'granted') {
         Alert.alert('Permissão negada', 'Não foi possível acessar a sua localização.');
         return;
       }
 
       const loc = await Location.getCurrentPositionAsync({});
-      setLocation(loc.coords); // Salvar as coordenadas
+      setLocation(loc.coords); 
     } catch (error) {
       console.error('Erro ao obter a localização:', error);
       Alert.alert('Erro', 'Não foi possível obter a localização.');
@@ -30,7 +30,7 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    // Chama a função de localização quando o componente é montado
+
     getLocation();
 
     const fetchSalons = async () => {
@@ -65,26 +65,26 @@ const App: React.FC = () => {
     fetchSalons();
   }, []);
 
-  // Função para calcular a distância entre duas coordenadas
+
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Raio da Terra em km
+    const R = 6371; 
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
               Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
               Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Retorna a distância em km
+    return R * c; 
   };
 
   const filteredSalons = salons.filter(salon => {
-    if (!location) return true; // Se não tivermos a localização, exibe todos os salões
+    if (!location) return true; 
 
-    const salonCoords = salon.coords; // Supondo que os salões tenham coordenadas (latitude, longitude)
-    if (!salonCoords) return true; // Caso não tenha coordenadas, exibe o salão
+    const salonCoords = salon.coords; 
+    if (!salonCoords) return true; 
 
     const distance = calculateDistance(location.latitude, location.longitude, salonCoords.latitude, salonCoords.longitude);
-    return distance <= 5; // Filtra os salões até 5 km de distância
+    return distance <= 5; 
   });
 
   const handleSalonPress = async (id) => {

@@ -4,7 +4,7 @@ import { View, StyleSheet, Image, Text, FlatList, Animated, ActivityIndicator, A
 import { MaterialIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-// Adicionar imagens aos serviços
+
 const services = [
   { id: '1', image: require('@/assets/images/maquiador.jpg'), phrase: 'Transforme seu look com um toque de beleza!' },  
   { id: '2', image: require('@/assets/images/barbeiro.jpg'), phrase: 'Renove seu estilo com um corte de cabelo incrível!' },
@@ -130,31 +130,31 @@ export default function Home() {
 
         return null;
       }}
-      contentContainerStyle={styles.flatListContainer}  // Garantir que o fundo da tela tenha a cor desejada
+      contentContainerStyle={styles.flatListContainer}  
     />
   );
 }
 
 const styles = StyleSheet.create({
   flatListContainer: {
-    backgroundColor: '#008584', // Cor de fundo do FlatList
-    paddingBottom: 20, // Espaço no final da lista
+    backgroundColor: '#008584', 
+    paddingBottom: 20, 
   },
   logoContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 40, // Para ajustar a logo no topo
+    marginTop: 40, 
   },
   logo: {
-    width: 60,  // Ajustando o tamanho da logo
-    height: 60, // Ajustando o tamanho da logo
+    width: 60,  
+    height: 60, 
     resizeMode: 'contain',
   },
   logoText: {
-    fontSize: 22,  // Usando o mesmo tamanho de fonte do título de "Serviços Populares"
-    fontWeight: '300',  // Fonte fina
+    fontSize: 22,  
+    fontWeight: '300',  
     color: '#fff',
-    marginTop: 20,  // Espaço abaixo da logo
+    marginTop: 20, 
     textAlign: 'center',
   },
   section: {
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 22,
-    fontWeight: '300',  // Fonte fina
+    fontWeight: '300',  
     color: '#fff',
     marginBottom: 10,
     textAlign: 'center',
@@ -172,21 +172,21 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   cardImage: {
-    width: '100%',  // Faz com que a imagem ocupe toda a largura do card
-    height: 250,    // Ajuste o tamanho da imagem conforme necessário
+    width: '100%',  
+    height: 250,   
     resizeMode: 'cover',
-    borderRadius: 15,  // Arredonda as bordas da imagem
+    borderRadius: 15,  
   },
   cardPhrase: {
-    position: 'absolute',  // Coloca a frase sobre a imagem
-    bottom: 10,  // Distância do fundo
+    position: 'absolute',  
+    bottom: 10,  
     left: 0,
-    right: 0,   // Para centralizar no meio
-    textAlign: 'center',  // Centraliza o texto
+    right: 0,   
+    textAlign: 'center',  
     fontSize: 18,
-    fontWeight: '300',  // Torna a fonte mais fina
+    fontWeight: '300',  
     color: '#fff',
-    textShadowColor: 'rgba(0, 0, 0, 0.7)',  // Adiciona uma sombra para melhorar a visibilidade
+    textShadowColor: 'rgba(0, 0, 0, 0.7)',  
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 5,
   },
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   agendaText: {
     fontSize: 18,
-    fontWeight: '300',  // Usando a fonte fina, como solicitado
+    fontWeight: '300',  
     color: '#fff',
     textAlign: 'center',
     marginVertical: 15,
@@ -218,6 +218,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     textAlign: 'center',
-    fontWeight: '300',  // Fonte fina
+    fontWeight: '300',  
   },
 });

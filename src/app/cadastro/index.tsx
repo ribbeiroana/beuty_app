@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useRouter } from 'expo-router'; // Importando useRouter
+import { useRouter } from 'expo-router'; 
 
 export default function Cadastro() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const router = useRouter(); // Inicializando o router
+  const router = useRouter(); 
 
   const handleCadastro = async () => {
-    // Verifica se os campos estão preenchidos
+   
     if (!nome || !email || !senha) {
       Alert.alert('Erro no Cadastro', 'Por favor, preencha todos os campos.');
       return;
@@ -28,10 +28,10 @@ export default function Cadastro() {
       const data = await response.json();
 
       if (!response.ok) {
-        // Se a resposta não for OK, exibe a mensagem de erro
+       
         Alert.alert('Erro no Cadastro', data.message);
       } else {
-        // Se o cadastro for bem-sucedido, exibe um alerta de sucesso e redireciona para a tela de login
+       
         Alert.alert('Cadastro Concluído', `Bem vindo(a)! ${data.nome}.`);
         router.push('/login');
       }
@@ -63,7 +63,7 @@ export default function Cadastro() {
           placeholder="Digite seu email"
           value={email}
           onChangeText={setEmail}
-          inputMode="email"  // Substituído keyboardType por inputMode
+          inputMode="email"  
           autoCapitalize="none"
           placeholderTextColor="#aaa"
         />
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 200,
-    resizeMode: 'contain',  // Ajustado o uso de resizeMode
+    resizeMode: 'contain',  
   },
   inputContainer: {
     flexDirection: 'row',

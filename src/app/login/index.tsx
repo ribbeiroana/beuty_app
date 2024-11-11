@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Link } from 'expo-router';
@@ -22,21 +22,21 @@ export default function Login() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, senha: password }), // Certifique-se de que "senha" é o correto
+        body: JSON.stringify({ email, senha: password }), 
       });
 
       const data = await response.json();
-      console.log(data); // Para verificar a resposta
+      console.log(data); 
 
       if (!response.ok) {
         Alert.alert('Login Falhou', data.message || 'Erro desconhecido.');
       } else {
-        // Armazenar o token, ID do usuário e nome do usuário
+       
         await AsyncStorage.setItem('authToken', data.token);
-        await AsyncStorage.setItem('userId', data.id.toString()); // Armazena o ID como string
-        await AsyncStorage.setItem('userName', data.nome); // Armazenar o nome do usuário
+        await AsyncStorage.setItem('userId', data.id.toString()); 
+        await AsyncStorage.setItem('userName', data.nome); 
         Alert.alert('Bem-vindo(a)', `Olá, ${data.nome}!`);
-        router.push('/beauty'); // Redireciona para a tela de tabs
+        router.push('/beauty'); 
       }
       console.log(data.token);
     } catch (error) {
@@ -47,7 +47,7 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
-      <Image resizeMode="contain" style={styles.image} source={require('@/assets/images/logo.png')} />
+      <Image style={styles.image} source={require('@/assets/images/logo.png')} />
 
       <View style={styles.inputContainer}>
         <Ionicons name="mail" size={24} color="#008584" />
@@ -56,7 +56,7 @@ export default function Login() {
           placeholder="Digite seu email..."
           value={email}
           onChangeText={setEmail}
-          inputMode="email" // Substituído keyboardType por inputMode
+          keyboardType="email-address"
           autoCapitalize="none"
           placeholderTextColor="#aaa"
         />
@@ -74,15 +74,15 @@ export default function Login() {
         />
       </View>
 
-      <Pressable style={styles.button} onPress={handleLogin}>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>LOGIN</Text>
-      </Pressable>
+      </TouchableOpacity>
 
-      <Pressable>
+      <TouchableOpacity>
         <Link href="/cadastro">
           <Text style={styles.registerText}>Ainda não possui uma conta? Cadastre-se</Text>
         </Link>
-      </Pressable>
+      </TouchableOpacity>
     </View>
   );
 }

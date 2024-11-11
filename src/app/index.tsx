@@ -22,21 +22,21 @@ export default function Login() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, senha: password }), // Certifique-se de que "senha" é o correto
+        body: JSON.stringify({ email, senha: password }), 
       });
 
       const data = await response.json();
-      console.log(data); // Para verificar a resposta
+      console.log(data); 
 
       if (!response.ok) {
         Alert.alert('Login Falhou', data.message || 'Erro desconhecido.');
       } else {
-        // Armazenar o token, ID do usuário e nome do usuário
+       
         await AsyncStorage.setItem('authToken', data.token);
-        await AsyncStorage.setItem('userId', data.id.toString()); // Armazena o ID como string
-        await AsyncStorage.setItem('userName', data.nome); // Armazena o nome do usuário
+        await AsyncStorage.setItem('userId', data.id.toString()); 
+        await AsyncStorage.setItem('userName', data.nome); 
         Alert.alert('Bem-vindo(a)', `Olá, ${data.nome}!`);
-        router.push('/beauty'); // Redireciona para a tela de tabs
+        router.push('/beauty'); 
       }
       console.log(data.token);
     } catch (error) {

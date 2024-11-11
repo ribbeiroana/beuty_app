@@ -4,11 +4,11 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Favoritos() {
-  const [favoritos, setFavoritos] = useState([]); // Inicializa como array vazio
+  const [favoritos, setFavoritos] = useState([]);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Função para buscar os salões favoritos da API
+
   const buscarFavoritos = async () => {
     if (!token) return;
 
@@ -24,22 +24,22 @@ export default function Favoritos() {
       if (!response.ok) {
         const data = await response.json();
         Alert.alert('Erro', data.message || 'Erro ao buscar salões favoritos.');
-        setFavoritos([]);  // Em caso de erro, limpar favoritos
+        setFavoritos([]); 
         return;
       }
 
       const data = await response.json();
-      // Verificar se data é um array e, caso contrário, definir como array vazio
+     
       setFavoritos(Array.isArray(data) ? data : []);
       setLoading(false);
     } catch (error) {
       Alert.alert('Erro', 'Ocorreu um erro ao tentar buscar os salões favoritos.');
       console.error(error);
-      setFavoritos([]);  // Em caso de erro, limpar favoritos
+      setFavoritos([]);  
     }
   };
 
-  // Função para remover um salão dos favoritos
+ 
   const removerFavorito = async (salaoId) => {
     Alert.alert(
       'Confirmar Remoção',
@@ -59,7 +59,7 @@ export default function Favoritos() {
                   'Content-Type': 'application/json',
                   'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({}), // Corpo vazio
+                body: JSON.stringify({}), 
               });
 
               const data = await response.json();
@@ -69,7 +69,7 @@ export default function Favoritos() {
                 return;
               }
 
-              // Atualiza a lista de favoritos localmente
+         
               setFavoritos(favoritos.filter(favorito => favorito.id !== salaoId));
               Alert.alert('Sucesso', 'Salão removido dos favoritos com sucesso.');
             } catch (error) {
@@ -83,7 +83,7 @@ export default function Favoritos() {
     );
   };
 
-  // Função para adicionar um salão aos favoritos
+
   const adicionarFavorito = async (salaoId) => {
     try {
       const response = await fetch('https://beauty-api-private.onrender.com/favoritos', {
@@ -102,7 +102,7 @@ export default function Favoritos() {
         return;
       }
 
-      // Atualiza a lista de favoritos localmente (adiciona o novo salão à lista)
+      
       setFavoritos([...favoritos, data]);
       Alert.alert('Sucesso', 'Salão adicionado aos favoritos com sucesso.');
     } catch (error) {
@@ -126,7 +126,7 @@ export default function Favoritos() {
 
   useEffect(() => {
     if (token) {
-      buscarFavoritos(); // Chama a função ao montar o componente, se o token estiver disponível
+      buscarFavoritos();
     }
   }, [token]);
 
@@ -148,12 +148,12 @@ export default function Favoritos() {
 
         <View style={styles.imagemContainer}>
           <Image 
-            source={require('@/assets/images/designEstrela.png')} // Ajuste o caminho da imagem
+            source={require('@/assets/images/designEstrela.png')} 
             style={styles.estrelaImagem} 
           />
         </View>
 
-        {/* Exibe a mensagem "Nenhum salão favorito encontrado" se não houver favoritos */}
+    
         {Array.isArray(favoritos) && favoritos.length === 0 ? (
           <Text style={styles.semFavoritos}>Nenhum salão favorito encontrado.</Text>
         ) : (
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: '#ffffff',
     fontFamily: 'Roboto',
-    textAlign: 'center', // Centraliza o texto (removendo o uppercase)
+    textAlign: 'center', 
   },
   imagemContainer: {
     flexDirection: 'row',
@@ -235,12 +235,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-    marginLeft: 10,  // Alinhando à esquerda
+    marginLeft: 10, 
   },
   textoEndereco: {
     color: 'white',
     fontSize: 16,
-    marginLeft: 10,  // Alinhando à esquerda
+    marginLeft: 10, 
   },
   removerButton: {
     flexDirection: 'row',
@@ -250,8 +250,8 @@ const styles = StyleSheet.create({
     borderColor: '#ffffff',
     backgroundColor: '#31a1a1',
     marginTop: 10,
-    alignSelf: 'flex-start', // Alinha o botão à esquerda
-    marginLeft: 10,  // Alinha o botão à esquerda
+    alignSelf: 'flex-start', 
+    marginLeft: 10,  
   },
   removerTexto: {
     color: '#ffffff',

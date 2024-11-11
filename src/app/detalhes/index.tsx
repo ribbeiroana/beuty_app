@@ -52,14 +52,14 @@ const SalaoDetails = () => {
         const salaoData = await detalhesResponse.json();
         setSalao(salaoData);
 
-        // Verificando se favoritosData é um array válido
+      
         if (favoritosResponse.ok) {
           const favoritosData = await favoritosResponse.json();
-          // Garantir que favoritosData é um array antes de chamar .some
+          
           if (Array.isArray(favoritosData)) {
             setIsFavorito(favoritosData.some(f => f.salao?.id === salaoData.id));
           } else {
-            setIsFavorito(false); // Se não for array, não é favorito
+            setIsFavorito(false);
           }
         }
 
@@ -79,7 +79,7 @@ const SalaoDetails = () => {
     try {
       const cachedServicos = await AsyncStorage.getItem(`servicos_${selectedSalonId}`);
       if (cachedServicos) {
-        setServicos(JSON.parse(cachedServicos)); // Usar cache local, se disponível
+        setServicos(JSON.parse(cachedServicos)); 
       }
 
       console.log('Buscando serviços...');
@@ -144,12 +144,12 @@ const SalaoDetails = () => {
   const selecionarServico = (servico) => {
     console.log('Servico selecionado:', servico);
     setServicoSelecionado(servico.nome);
-    fetchHorarios(servico.id); // Passando o id corretamente para buscar horários
+    fetchHorarios(servico.id); 
   };
 
   const fetchHorarios = async (servicoId) => {
     setLoadingHorarios(true);
-    setHorariosVisiveis(false); // Esconde os horários enquanto carrega
+    setHorariosVisiveis(false); 
     try {
       console.log(`Buscando horários para o serviço com ID ${servicoId}...`);
       const token = await AsyncStorage.getItem('authToken');
@@ -158,7 +158,7 @@ const SalaoDetails = () => {
       });
 
       if (!response.ok) {
-        // Verificar se o erro é 404 e mostrar mensagem apropriada
+       
         if (response.status === 404) {
           Alert.alert('Sem horários disponíveis', 'Não há horários disponíveis para este serviço.');
         } else {
@@ -182,7 +182,7 @@ const SalaoDetails = () => {
     } catch (error) {
       setHorariosSelecionados([]);
       setHorariosVisiveis(false);
-      // Alert já tratado no erro 404
+      
     } finally {
       setLoadingHorarios(false);
     }

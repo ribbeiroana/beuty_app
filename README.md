@@ -1,50 +1,38 @@
-# Welcome to your Expo app 👋
+# Beauty App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+O **Beauty App** é um aplicativo desenvolvido para ajudar os usuários a encontrar o salão de beleza mais próximo, agendar horários e gerenciar seus salões favoritos. O app permite que o usuário pesquise salões por localização, visualize os serviços oferecidos e até mesmo marque compromissos diretamente pelo celular.
 
-## Get started
+## Funcionalidades
 
-1. Install dependencies
+- **Cadastro**: Realize o cadastro de um novo usuário no aplicativo.
+- **Login**: Autentique-se com um login seguro para acessar suas funcionalidades personalizadas.
+- **Página Inicial**: Dicas e informações úteis sobre cuidados pessoais e beleza.
+- **Pesquisa de Salões**: 
+  - Encontre salões digitando o nome ou usando a localização para encontrar os salões mais próximos.
+  - Veja a lista de salões disponíveis de acordo com sua localização.
+- **Serviços do Salão**: Visualize os serviços oferecidos pelos salões, com detalhes sobre preços e disponibilidade.
+- **Favoritos**: 
+  - Adicione salões aos favoritos.
+  - Remova salões dos favoritos a qualquer momento.
+- **Agendamento de Horários**: Agende um horário com o salão diretamente pelo app.
+- **Histórico de Agendamentos**: 
+  - Veja os agendamentos realizados.
+  - Cancele um agendamento se necessário.
 
-   ```bash
-   npm install
-   ```
+## Tecnologias Usadas
 
-2. Start the app
+- **React Native**: Framework para desenvolvimento de aplicativos móveis.
+- **Expo**: Ferramenta para facilitar o desenvolvimento e deploy de apps React Native.
+- **TypeScript (TSX)**: Linguagem para adicionar tipagem estática e facilitar o desenvolvimento.
+- **AsyncStorage**: Utilizado para armazenamento local de dados (ex: token de autenticação, favoritos, etc.).
 
-   ```bash
-    npx expo start
-   ```
+## Como Rodar o Projeto
 
-In the output, you'll find options to open the app in a
+### Pré-requisitos
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+- **Node.js**: Você precisará do Node.js instalado para rodar o projeto. Se ainda não o instalou, pode baixar [aqui](https://nodejs.org/).
+- **Expo**: Ferramenta para facilitar o desenvolvimento de aplicativos React Native. Você pode instalar o Expo CLI globalmente com o seguinte comando:
 
 ```bash
-npm run reset-project
-```
+npm install
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

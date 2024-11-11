@@ -4,14 +4,14 @@ import { TouchableOpacity } from 'react-native';
 import { useNavigation } from 'expo-router';
 
 export default function Layout() {
-  const navigation = useNavigation();  // Para navegar para a tela anterior
+  const navigation = useNavigation(); 
 
   return (
     <Tabs screenOptions={{ headerShown: true, tabBarStyle: { display: 'none' } }}>
       <Tabs.Screen
-        name="index"  // Nome da tela
+        name="index"  
         options={{
-          title: 'Salão', // Título do header
+          title: 'Salão', 
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <FontAwesome name="arrow-left" size={24} color="#000" />
@@ -19,7 +19,7 @@ export default function Layout() {
           ),
         }}
       />
-      {/* Você pode adicionar mais telas, se necessário */}
+  
     </Tabs>
   );
 }
