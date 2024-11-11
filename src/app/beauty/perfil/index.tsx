@@ -180,6 +180,7 @@ const styles = StyleSheet.create({
   card: {
     height: 80,
     padding: 10,
+    marginTop: 40,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     shadowColor: '#000',
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'transparent',
     borderWidth: 0,
-    backgroundImage: 'linear-gradient(160deg, #008584 0%, #caffed 100%)',
+    backgroundColor: '#007B7A',
   },
   usuario: {
     fontWeight: '800',

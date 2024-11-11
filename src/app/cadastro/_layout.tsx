@@ -1,19 +1,24 @@
-import { Stack, Tabs } from 'expo-router';
+import { Stack } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
+import { useNavigation } from 'expo-router';
 
 export default function Layout() {
+  const navigation = useNavigation();  // Para navegar para a tela anterior
+
   return (
-    <Stack screenOptions={{ }}>
+    <Stack>
       <Stack.Screen
-        name='index'  // Home
+        name="index"  // Nome da tela
         options={{
-          title: 'Cadastro',
-          // tabBarIcon: ({ focused, size }) => (
-          //   <FontAwesome name='' color={'#008584'} size={size} />
-          // ),
+          title: 'Cadastro', // Título do header
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <FontAwesome name="arrow-left" size={24} color="#000" />
+            </TouchableOpacity>
+          ),
         }}
       />
     </Stack>
-
   );
 }

@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, ScrollView, Text, View, TextInput, FlatList, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TextInput, FlatList, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -73,37 +73,40 @@ const App: React.FC = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={styles.container}>
-        <Text style={styles.headerText}>ENCONTRE O ATENDIMENTO MAIS PERTO DE VOCÊ...</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Digite o endereço do salão..."
-          value={search}
-          onChangeText={text => setSearch(text)}
-        />
-        
-        <FlatList
-          data={filteredSalons}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.salonContainer}>
-              <Image source={{ uri: item.logo }} style={styles.salonImage} />
-              <View style={styles.salonInfo}>
-                <Text style={styles.salonName}>{item.nome}</Text>
-                <Text style={styles.salonAddress}>{item.endereco}</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.salonButton} 
-                onPress={() => handleSalonPress(item.id)}
-              >
-                <Text style={styles.salonButtonText}>VER DETALHES</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        />
-      </View>
-    </ScrollView>
+    <FlatList
+      contentContainerStyle={styles.container}  // Usando FlatList para a rolagem
+      data={filteredSalons}
+      keyExtractor={item => item.id.toString()}
+      ListHeaderComponent={() => (
+        <>
+          <Text style={styles.headerText}>ENCONTRE O ATENDIMENTO MAIS PERTO DE VOCÊ...</Text>
+          
+          {/* Campo de busca */}
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Digite o endereço do salão..."
+            placeholderTextColor="#777777"  // Cor do texto do placeholder
+            value={search}
+            onChangeText={text => setSearch(text)}
+          />
+        </>
+      )}
+      renderItem={({ item }) => (
+        <View style={styles.salonContainer}>
+          <Image source={{ uri: item.logo }} style={styles.salonImage} />
+          <View style={styles.salonInfo}>
+            <Text style={styles.salonName}>{item.nome}</Text>
+            <Text style={styles.salonAddress}>{item.endereco}</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.salonButton} 
+            onPress={() => handleSalonPress(item.id)}
+          >
+            <Text style={styles.salonButtonText}>VER DETALHES</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    />
   );
 };
 
@@ -111,7 +114,7 @@ export default App;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#007B7A',
     padding: 20,
   },
@@ -119,7 +122,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#007B7A',
+    backgroundColor: '#007B7A',  // Manter o fundo enquanto carrega
   },
   loadingText: {
     color: '#FFFFFF',
@@ -129,14 +132,22 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     textAlign: 'center',
-    fontWeight: 600,
+    fontWeight: '600',
     marginBottom: 20,
+    marginTop: 50,
   },
   searchInput: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     padding: 10,
     marginBottom: 20,
+    color: '#333333',  // Cor do texto digitado
+    fontSize: 16,  // Tamanho do texto
+    elevation: 3,  // Para um leve efeito de sombra no Android
+    shadowColor: '#000',  // Para iOS (sombra)
+    shadowOffset: { width: 0, height: 2 },  // Configura a posição da sombra
+    shadowOpacity: 0.2,  // Opacidade da sombra
+    shadowRadius: 3,  // Tamanho da sombra
   },
   salonContainer: {
     backgroundColor: '#FFFFFF',

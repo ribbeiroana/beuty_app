@@ -4,15 +4,13 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Favoritos() {
-  const [favoritos, setFavoritos] = useState([]); // Inicializando favoritos como array vazio
+  const [favoritos, setFavoritos] = useState([]);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Função para buscar os salões favoritos da API
   const buscarFavoritos = async () => {
     if (!token) return;
-
-    setLoading(true); // Começa o loading ao iniciar a busca.
 
     try {
       const response = await fetch('https://beauty-api-private.onrender.com/favoritos', {
@@ -26,17 +24,13 @@ export default function Favoritos() {
       if (!response.ok) {
         const data = await response.json();
         Alert.alert('Erro', data.message || 'Erro ao buscar salões favoritos.');
-        setLoading(false); // Finaliza o carregamento
         return;
       }
 
       const data = await response.json();
-      
-      // Garantir que data seja um array
-      setFavoritos(Array.isArray(data) ? data : []);
-      setLoading(false); // Finaliza o carregamento após dados serem recebidos
+      setFavoritos(data);
+      setLoading(false);
     } catch (error) {
-      setLoading(false); // Finaliza o carregamento
       Alert.alert('Erro', 'Ocorreu um erro ao tentar buscar os salões favoritos.');
       console.error(error);
     }
@@ -44,29 +38,46 @@ export default function Favoritos() {
 
   // Função para remover um salão dos favoritos
   const removerFavorito = async (salaoId) => {
-    try {
-      const response = await fetch(`https://beauty-api-private.onrender.com/favoritos/${salaoId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+    Alert.alert(
+      'Confirmar Remoção',
+      'Você tem certeza que deseja remover este salão dos favoritos?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
         },
-      });
+        {
+          text: 'Remover',
+          onPress: async () => {
+            try {
+              const response = await fetch(`https://beauty-api-private.onrender.com/favoritos/${salaoId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({}), // Corpo vazio
+              });
 
-      const data = await response.json();
+              const data = await response.json();
 
-      if (!response.ok) {
-        Alert.alert('Erro', data.message || 'Erro ao remover salão dos favoritos.');
-        return;
-      }
+              if (!response.ok) {
+                Alert.alert('Erro', data.message || 'Erro ao remover salão dos favoritos.');
+                return;
+              }
 
-      // Atualiza a lista de favoritos após remoção
-      setFavoritos(favoritos.filter(favorito => favorito.id !== salaoId));
-      Alert.alert('Sucesso', 'Salão removido dos favoritos com sucesso.');
-    } catch (error) {
-      Alert.alert('Erro', 'Ocorreu um erro ao tentar remover o salão dos favoritos.');
-      console.error(error);
-    }
+              // Atualiza a lista de favoritos
+              setFavoritos(favoritos.filter(favorito => favorito.id !== salaoId));
+              Alert.alert('Sucesso', 'Salão removido dos favoritos com sucesso.');
+            } catch (error) {
+              Alert.alert('Erro', 'Ocorreu um erro ao tentar remover o salão dos favoritos.');
+              console.error(error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   useEffect(() => {
@@ -84,7 +95,7 @@ export default function Favoritos() {
 
   useEffect(() => {
     if (token) {
-      buscarFavoritos(); // Chama a função de busca assim que o token estiver disponível
+      buscarFavoritos(); // Chama a função ao montar o componente, se o token estiver disponível
     }
   }, [token]);
 
@@ -111,7 +122,7 @@ export default function Favoritos() {
           />
         </View>
 
-        {favoritos && favoritos.length === 0 ? (
+        {favoritos.length === 0 ? (
           <Text style={styles.semFavoritos}>Nenhum salão favorito encontrado.</Text>
         ) : (
           favoritos.map((salao) => (
@@ -148,6 +159,7 @@ const styles = StyleSheet.create({
   },
   card: {
     height: 80,
+    marginTop: 40,
     padding: 10,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
@@ -161,7 +173,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: 'transparent',
     borderWidth: 0,
-    backgroundImage: 'linear-gradient(160deg, #008584 0%, #caffed 100%)',
+    backgroundColor: '#007B7A',
   },
   titulo: {
     fontWeight: '800',
@@ -185,8 +197,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     borderRadius: 10,
     elevation: 2,
-    backgroundColor: '#008584',
-    backgroundImage: 'linear-gradient(160deg, #008584 0%, #caffed 100%)',
+    backgroundColor: '#007B7A',
   },
   textoNome: {
     color: 'white',
@@ -204,7 +215,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 7,
     borderRadius: 5,
-    // borderWidth: 1,
     borderColor: '#ffffff',
     backgroundColor: '#31a1a1',
     marginTop: 10,

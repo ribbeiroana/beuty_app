@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Image, Text, ScrollView, FlatList, Animated, ActivityIndicator, Alert } from 'react-native';
+import { View, StyleSheet, Image, Text, FlatList, Animated, ActivityIndicator, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
@@ -48,85 +48,114 @@ export default function Home() {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View style={styles.container}>
-        {/* Logo no canto esquerdo */}
-        <Image style={styles.logo} source={require('@/assets/images/logo.png')} />
-        
-        {/* Texto abaixo da logo com formatação igual ao de "Serviços Populares" */}
-        <Text style={styles.logoText}>
-          Encontre os melhores serviços de beleza ao seu redor
-        </Text>
+    <FlatList
+      data={[
+        { type: 'logo', content: null },
+        { type: 'header', content: 'Encontre os melhores serviços de beleza ao seu redor' },
+        { type: 'services', content: services },
+        { type: 'agenda', content: 'Agende um horário pesquisando o serviço mais próximo de você' },
+        { type: 'beautyTips', content: beautyTips },
+      ]}
+      keyExtractor={(item, index) => `${item.type}-${index}`}
+      renderItem={({ item }) => {
+        if (item.type === 'logo') {
+          return (
+            <View style={styles.logoContainer}>
+              <Image style={styles.logo} source={require('@/assets/images/logo.png')} />
+            </View>
+          );
+        }
 
-        {/* Seção de Serviços Populares */}
-        <View style={styles.section}>
-          <FlatList
-            data={services}
-            keyExtractor={(item) => item.id}
-            numColumns={1}  // Exibir em uma única coluna
-            renderItem={({ item }) => (
-              <View style={styles.imageContainer}>
-                <Image source={item.image} style={styles.cardImage} />
-                <Text style={styles.cardPhrase}>{item.phrase}</Text>
-              </View>
-            )}
-            contentContainerStyle={styles.cardList}
-          />
-        </View>
+        if (item.type === 'header') {
+          return (
+            <Text style={styles.logoText}>
+              {item.content}
+            </Text>
+          );
+        }
 
-        {/* Texto substituindo o botão de agendamento */}
-        <View style={styles.section}>
-          <Text style={styles.agendaText}>Agende um horário pesquisando o serviço mais próximo de você</Text>
-        </View>
-
-        {/* Seção de Dicas de Beleza */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Dicas de Beleza</Text>
-          {loading ? (
-            <ActivityIndicator size="large" color="#FFFFFF" />
-          ) : (
-            <FlatList
-              keyExtractor={(item) => item.id}
-              data={beautyTips}
-              renderItem={({ item }) => (
-                <Animated.View style={[styles.card, { 
-                  opacity: fadeAnim, 
-                  transform: [{ translateX: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [100, 0] }) }] 
-                }]} >
-                  <View style={styles.tipCard}>
-                    <Text style={styles.tipText}>{item.tip}</Text>
+        if (item.type === 'services') {
+          return (
+            <View style={styles.section}>
+              <FlatList
+                data={item.content}
+                keyExtractor={(service) => service.id}
+                numColumns={1}
+                renderItem={({ item }) => (
+                  <View style={styles.imageContainer}>
+                    <Image source={item.image} style={styles.cardImage} />
+                    <Text style={styles.cardPhrase}>{item.phrase}</Text>
                   </View>
-                </Animated.View>
+                )}
+                contentContainerStyle={styles.cardList}
+              />
+            </View>
+          );
+        }
+
+        if (item.type === 'agenda') {
+          return (
+            <View style={styles.section}>
+              <Text style={styles.agendaText}>{item.content}</Text>
+            </View>
+          );
+        }
+
+        if (item.type === 'beautyTips') {
+          return (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Dicas de Beleza</Text>
+              {loading ? (
+                <ActivityIndicator size="large" color="#FFFFFF" />
+              ) : (
+                <FlatList
+                  data={item.content}
+                  keyExtractor={(tip) => tip.id}
+                  renderItem={({ item }) => (
+                    <Animated.View style={[styles.card, { 
+                      opacity: fadeAnim, 
+                      transform: [{ translateX: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [100, 0] }) }] 
+                    }]} >
+                      <View style={styles.tipCard}>
+                        <Text style={styles.tipText}>{item.tip}</Text>
+                      </View>
+                    </Animated.View>
+                  )}
+                  contentContainerStyle={styles.tipsList}
+                />
               )}
-              contentContainerStyle={styles.tipsList}
-            />
-          )}
-        </View>
-      </View>
-    </ScrollView>
+            </View>
+          );
+        }
+
+        return null;
+      }}
+      contentContainerStyle={styles.flatListContainer}  // Garantir que o fundo da tela tenha a cor desejada
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#008584',
-    padding: 16,
-    flex: 1,
+  flatListContainer: {
+    backgroundColor: '#008584', // Cor de fundo do FlatList
+    paddingBottom: 20, // Espaço no final da lista
+  },
+  logoContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 40, // Para ajustar a logo no topo
   },
   logo: {
     width: 60,  // Ajustando o tamanho da logo
     height: 60, // Ajustando o tamanho da logo
     resizeMode: 'contain',
-    position: 'absolute',  // Posicionando no canto superior esquerdo
-    top: 16,
-    left: 16,
   },
   logoText: {
     fontSize: 22,  // Usando o mesmo tamanho de fonte do título de "Serviços Populares"
     fontWeight: '300',  // Fonte fina
     color: '#fff',
-    marginTop: 40,  // Espaço abaixo da logo
-    textAlign: 'center',  // Centraliza o texto
+    marginTop: 20,  // Espaço abaixo da logo
+    textAlign: 'center',
   },
   section: {
     marginVertical: 20,
@@ -136,7 +165,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',  // Fonte fina
     color: '#fff',
     marginBottom: 10,
-    textAlign: 'center',  // Centraliza o título
+    textAlign: 'center',
   },
   imageContainer: {
     position: 'relative',
@@ -164,12 +193,6 @@ const styles = StyleSheet.create({
   cardList: {
     paddingBottom: 20,
   },
-  item: {
-    marginTop: 5,
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
-  },
   agendaText: {
     fontSize: 18,
     fontWeight: '300',  // Usando a fonte fina, como solicitado
@@ -181,8 +204,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   tipCard: {
-    backgroundColor: '#008584',
-    backgroundImage: 'linear-gradient(160deg, #008584 0%, #caffed 100%)',  // Gradiente de fundo
+    backgroundColor: '#007B7A',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
