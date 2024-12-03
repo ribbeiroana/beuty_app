@@ -3,6 +3,15 @@
 O **Beauty App** é um aplicativo desenvolvido para ajudar os usuários a encontrar o salão de beleza mais próximo, agendar horários e gerenciar seus salões favoritos. O app permite que o usuário pesquise salões por localização, visualize os serviços oferecidos e até mesmo marque compromissos diretamente pelo celular.
 <br>
 (Projeto de extensão da Faculdade)
+
+<img src='./assets/images/readme (2).png' alt='tela'>
+
+## Api do projeto
+Desenvolvido por uma integrante do grupo:
+```bash
+https://github.com/VitoriaLuizaDeveloper/beauty-api.git
+```
+
 ## Funcionalidades
 
 - **Cadastro**: Realize o cadastro de um novo usuário no aplicativo.
