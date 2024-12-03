@@ -1,6 +1,7 @@
 # Beauty App
 
 O **Beauty App** é um aplicativo desenvolvido para ajudar os usuários a encontrar o salão de beleza mais próximo, agendar horários e gerenciar seus salões favoritos. O app permite que o usuário pesquise salões por localização, visualize os serviços oferecidos e até mesmo marque compromissos diretamente pelo celular.
+<br>
 (Projeto de extensão da Faculdade)
 ## Funcionalidades
 
