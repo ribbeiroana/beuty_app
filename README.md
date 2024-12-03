@@ -4,7 +4,7 @@ O **Beauty App** é um aplicativo desenvolvido para ajudar os usuários a encont
 <br>
 (Projeto de extensão da Faculdade)
 
-<img src='./assets/images/readme (2).png' alt='tela'>
+<img src='./assets/images/readme.png' alt='tela'>
 
 ## Api do projeto
 Desenvolvido por uma integrante do grupo:
