@@ -47,7 +47,7 @@ https://github.com/VitoriaLuizaDeveloper/beauty-api.git
   
 **Clone o repositório:**:
 ```bash
-git clone https://github.com/ribbeiroana/refatoramento.git
+git clone https://github.com/ribbeiroana/beuty_app.git
 ```
 
 **Instale as dependências:**:
